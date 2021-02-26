@@ -1,0 +1,1517 @@
+<html>
+    <head>
+    <title></title>
+        <link rel="stylesheet" href="../css/index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/highcharts-more.js"></script>
+        <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    </head>
+<script>
+//시군구 미세먼지
+    var xmlData;    
+
+    var xhr = new XMLHttpRequest();
+    var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getCtprvnMesureSidoLIst'; /*URL*/
+    var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('31'); /**/
+    queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+    queryParams += '&' + encodeURIComponent('sidoName') + '=' + encodeURIComponent('경기'); /**/
+    queryParams += '&' + encodeURIComponent('searchCondition') + '=' + encodeURIComponent('HOUR'); /**/
+    xhr.open('GET', url + queryParams);
+    xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            xmlData = this.responseText;
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xmlData,"text/xml");
+
+            xmlItems = xmlDoc.getElementsByTagName("item");
+
+            var dustBox = document.getElementById("dust-box");
+            
+            var sendDate = xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("dataTime")[0].childNodes[0].nodeValue;
+
+            document.getElementById("send-date").innerText = sendDate;
+            
+
+            for(var i = 0 ; i < xmlItems.length; i++){
+                console.log(xmlItems[i]);
+                console.log(xmlItems[i].getElementsByTagName("cityName")[0]);
+
+                var dustBoxPtag10 = document.createElement("p");
+                var dustBoxPtag25 = document.createElement("p");
+
+                var pm10Span = document.createElement("span");
+         
+                var pm25Span = document.createElement("span");
+
+                var siName = xmlItems[i].getElementsByTagName("cityName")[0].childNodes[0].nodeValue; //시 이름
+                var pm10Value = xmlItems[i].getElementsByTagName("pm10Value")[0].childNodes[0].nodeValue; //미세먼지 값
+                var pm25Value = xmlItems[i].getElementsByTagName("pm25Value")[0].childNodes[0].nodeValue //초미세먼지 값
+
+                if(pm10Value > 0 && pm10Value <= 30){
+                    pm10Span.setAttribute("style", "color:blue");
+                }
+                else if(pm10Value > 30 && pm10Value <= 80){
+                    pm10Span.setAttribute("style", "color: #20f50c");
+                }
+                else if(pm10Value > 80 && pm10Value <= 150){
+                    pm10Span.setAttribute("style", "color:#fd7607");
+                }
+                else{
+                    pm10Span.setAttribute("style", "color:red");
+                }
+
+                if(pm25Value > 0 && pm25Value <= 15){
+                    pm25Span.setAttribute("style", "color:blue");
+                }
+                else if(pm25Value > 15 && pm25Value <= 35){
+                    pm25Span.setAttribute("style", "color: #20f50c");
+                }
+                else if(pm25Value > 35 && pm25Value <= 75){
+                    pm25Span.setAttribute("style", "color:#fd7607");
+                }
+                else{
+                    pm25Span.setAttribute("style", "color:red");
+                }
+                dustBoxPtag10.innerText = siName+ " 미세먼지 : ";
+                pm10Span.innerText = pm10Value;
+                dustBoxPtag25.innerText += " 초미세먼지 : ";
+                pm25Span.innerText = pm25Value;
+
+                
+                // + pm10Value+" 초미세먼지 : " +pm25Value;
+                
+                
+                dustBoxPtag10.appendChild(pm10Span);
+                dustBoxPtag25.appendChild(pm25Span);
+                dustBox.appendChild(dustBoxPtag10);
+                dustBox.appendChild(dustBoxPtag25);
+            }
+            
+        }
+    };
+
+    xhr.send('');
+
+</script>
+
+
+
+
+<script>
+    // (사용 예)
+    //<!--
+    //
+    // LCC DFS 좌표변환을 위한 기초 자료
+    //
+    var RE = 6371.00877; // 지구 반경(km)
+    var GRID = 5.0; // 격자 간격(km)
+    var SLAT1 = 30.0; // 투영 위도1(degree)
+    var SLAT2 = 60.0; // 투영 위도2(degree)
+    var OLON = 126.0; // 기준점 경도(degree)
+    var OLAT = 38.0; // 기준점 위도(degree)
+    var XO = 43; // 기준점 X좌표(GRID)
+    var YO = 136; // 기1준점 Y좌표(GRID)
+    //
+    // LCC DFS 좌표변환 ( code : "toXY"(위경도->좌표, v1:위도, v2:경도), "toLL"(좌표->위경도,v1:x, v2:y) )
+    //
+
+
+    function dfs_xy_conv(code, v1, v2) {
+        var DEGRAD = Math.PI / 180.0;
+        var RADDEG = 180.0 / Math.PI;
+
+        var re = RE / GRID;
+        var slat1 = SLAT1 * DEGRAD;
+        var slat2 = SLAT2 * DEGRAD;
+        var olon = OLON * DEGRAD;
+        var olat = OLAT * DEGRAD;
+
+        var sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+        var sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+        var ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+        ro = re * sf / Math.pow(ro, sn);
+        var rs = {};
+        if (code == "toXY") {
+            rs['lat'] = v1;
+            rs['lng'] = v2;
+            var ra = Math.tan(Math.PI * 0.25 + (v1) * DEGRAD * 0.5);
+            ra = re * sf / Math.pow(ra, sn);
+            var theta = v2 * DEGRAD - olon;
+            if (theta > Math.PI) theta -= 2.0 * Math.PI;
+            if (theta < -Math.PI) theta += 2.0 * Math.PI;
+            theta *= sn;
+            rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+            rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+            
+        }
+        else {
+            rs['x'] = v1;
+            rs['y'] = v2;
+            var xn = v1 - XO;
+            var yn = ro - v2 + YO;
+            ra = Math.sqrt(xn * xn + yn * yn);
+            if (sn < 0.0) - ra;
+            var alat = Math.pow((re * sf / ra), (1.0 / sn));
+            alat = 2.0 * Math.atan(alat) - Math.PI * 0.5;
+
+            if (Math.abs(xn) <= 0.0) {
+                theta = 0.0;
+            }
+            else {
+                if (Math.abs(yn) <= 0.0) {
+                    theta = Math.PI * 0.5;
+                    if (xn < 0.0) - theta;
+                }
+                else theta = Math.atan2(xn, yn);
+            }
+            var alon = theta / sn + olon;
+            rs['lat'] = alat * RADDEG;
+            rs['lng'] = alon * RADDEG;
+        }
+        return rs;
+    }
+
+    
+    //현재 위치 위도 경도 x,y좌표로 바꾼 뒤 현재 날짜 구하고 기상청 날씨 API 호출 하는 함수
+    function getLocation() {
+        if (navigator.geolocation) { // GPS를 지원하면
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var rs = dfs_xy_conv("toXY",position.coords.latitude, position.coords.longitude);
+                
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1; //January is 0!
+                var yyyy = today.getFullYear();
+
+                var hours = today.getHours();
+                var minutes = today.getMinutes();
+                
+                
+
+                if(minutes < 10){
+                    minutes = '0' + minutes;
+                }
+
+                if(dd<10) {
+                    dd='0'+dd
+                } 
+
+                if(mm<10) {
+                    mm='0'+mm
+                } 
+                today = yyyy+mm+dd;
+
+                console.log(hours +":"+ minutes);
+
+                /* 기상청 날씨 API 동네예보*/
+                var xhr = new XMLHttpRequest();
+                var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst'; /*URL*/
+                var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+                queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+                queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('225'); /**/
+                queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
+                queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(String(today)); /**/
+                queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0200'); /**/
+                queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(rs.x); /**/
+                queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(rs.y); /**/
+                xhr.open('GET', url + queryParams);
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+
+                        var weatherBox = document.getElementById("weather-box");
+                        
+                        var spanmintemp = document.createElement("span");
+
+                        var spanmaxtemp = document.createElement("span");
+
+                        
+
+                        var jsonData = JSON.parse(this.responseText);
+
+                        //console.log(jsonData);
+                        $.each(jsonData["response"]["body"]["items"]["item"], function(key, value){
+                            if(value.category == 'TMN' && value.fcstDate == String(today)){
+                                spanmintemp.innerHTML = '최저 ' +value.fcstValue + "℃"; //아침 최저기온
+                                spanmintemp.setAttribute("style", "color:blue; margin-left:10px;");
+                                
+                            }
+                            else if(value.category == 'TMX' && value.fcstDate == String(today)){
+                                spanmaxtemp.innerHTML = '최고 '+ value.fcstValue + "℃"; //낮 최고기온
+                                spanmaxtemp.setAttribute("style", "color:red; margin-left:20px;");
+                            }
+                            
+                        })
+                    
+                        weatherBox.appendChild(spanmaxtemp);
+                        weatherBox.appendChild(spanmintemp);
+                            
+                    }
+                };
+                xhr.send('');
+
+
+
+                realhour = hours - 1;
+
+                if(realhour < 10){
+                    realhour = '0' + realhour;
+                }
+
+                
+
+                //초단기 예보
+                var xhr = new XMLHttpRequest();
+                var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst'; /*URL*/
+                var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+                queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+                queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('60'); /**/
+                queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
+                queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(String(today)); /**/
+                queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(realhour+"30"); /**/
+                queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(rs.x); /**/
+                queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(rs.y); /**/
+                xhr.open('GET', url + queryParams);
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        var jsonData = JSON.parse(this.responseText);
+                        console.log(jsonData)
+                        $.each(jsonData["response"]["body"]["items"]["item"], function(key, value){
+                            
+                            if(value.category == 'T1H' && hours == parseInt(value.fcstTime.substring(0,2))){
+                                $('.nowtemp').text(value.fcstValue + '℃ ');
+                                $('.nowtemp').css({
+                                    'margin-right':'10px',
+                                    'font-size':'25px'
+                                });
+                            }
+                            else if(value.category == 'PTY' && hours == parseInt(value.fcstTime.substring(0,2)) || value.category == 'SKY' && hours == parseInt(value.fcstTime.substring(0,2)) ){
+                                console.log(value.category);
+                                
+                                if(value.fcstValue != 0 && value.category == 'PTY'){
+                                    //비, 눈비, 소나기, 빗방울 등등
+                                    
+                                    
+                                }
+                                else{
+                                    if(value.fcstValue == 1){
+                                        $('#weather-box .weather-icon').css({
+                                            'background' : 'url("../img/day.svg") no-repeat',
+                                            'background-repeat': 'no-repeat',
+                                            'background-position': 'center center',
+                                            //'background-size': 'contain',
+                                            'width':'64px',
+                                            'height': '64px',
+                                            'display': 'inline-block'
+                                        });
+                                        $('.weather-state').text('맑음');
+                                        $('.weather-state').css({
+                                            'font-size':'18px'
+                                        });
+                                    }
+                                    else if(value.fcstValue == 3){
+                                        $('#weather-box .weather-icon').css({
+                                            'background' : 'url("../img/cloudy-day-1.svg") no-repeat',
+                                            'width':'64px',
+                                            'height': '64px',
+                                            'display': 'inline-block'
+                                        });
+                                        $('.weather-state').text('구름 많음');
+                                    }
+                                    else if(value.fcstValue == 4){
+                                        $('#weather-box .weather-icon').css({
+                                            'background' : 'url("../img/cloudy.svg") no-repeat',
+                                            'width':'64px',
+                                            'height': '64px',
+                                            'display': 'inline-block'
+                                        });
+                                        $('.weather-state').text('흐림');
+                                    }
+                                    //맑음, 흐림, 그런거 ,구름많음
+                                }
+                            }
+                        })
+                    }
+                };
+
+                xhr.send('');
+            }, 
+            function(error) {
+                console.error(error);
+            },{
+                enableHighAccuracy: false,
+                maximumAge: 0,
+                timeout: Infinity
+            });
+        } else {
+            alert('GPS를 지원하지 않습니다');
+        }
+    }
+    getLocation();
+    
+/*
+    $(function () {
+        var gaugeOptions = {
+        chart: {
+            type: 'solidgauge'
+        },
+
+        title: null,
+
+        pane: {
+            center: ['40%', '50%'],
+            size: '60%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+                backgroundColor:
+                    Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+
+        exporting: {
+            enabled: false
+        },
+
+        tooltip: {
+            enabled: false
+        },
+
+        // the value axis
+        yAxis: {
+            stops: [
+                [0.1, '#06b0f8'], //blue
+                [0.3, '#36f806'], // green
+                [0.7, '#f88b06'], // orange
+                [0.9, '#f80606'] // red
+            ],
+            lineWidth: 0,
+            tickWidth: 0,
+            minorTickInterval: null,
+            tickAmount: 2,
+            title: {
+                y: -70
+            },
+            labels: {
+                y: 16
+            }
+        },
+
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    y: 5,
+                    borderWidth: 0,
+                    useHTML: true
+                }
+            }
+        }
+    };
+
+    // The speed gauge
+    var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
+        yAxis: {
+            min: 0,
+            max: 150,
+            title: {
+                text: '미세먼지'
+            }
+        },
+
+        credits: {
+            enabled: false
+        },
+
+        series: [{
+            name: 'Speed',
+            data: [110],
+            dataLabels: {
+                format:
+                    '<div style="text-align:center">' +
+                    '<span style="font-size:25px">{y}</span><br/>' +
+                    '<span style="font-size:12px;opacity:0.4">ug/m3</span>' +
+                    '</div>'
+            },
+            tooltip: {
+                valueSuffix: 'ug/m3'
+            }
+        }]
+
+    }));
+
+});*/
+
+    
+    
+</script>
+
+<script>
+    var dust = [];
+    var sensorData = [];
+
+    $(function () {
+    
+
+    $.ajax({
+          type : 'get',
+          url : 'http://192.168.0.118:2021/Gyeonggido?rcn=4&fu=2&lim=10&ty=4',
+          dataType : 'json',
+          beforeSend : function(xhr){
+            xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+            xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+            xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+          },
+          async : false,
+          success : function(result){
+            
+            $.each(result["m2m:rsp"]["m2m:cin"], function(key, value){
+                console.log(value);
+                dust.push(value.con.dust);
+                sensorData.push(value.con.sen);
+
+            })
+        }
+    })
+
+    console.log(sensorData);
+    console.log(dust);
+    var pm10percent = (dust[0][0] / 150) * 100;
+    var pm25percent = (dust[0][1] / 150) * 100;
+    var co2percent = (sensorData[0].co2 / 150) * 100;
+    var tvocpercent = (sensorData[0].voc / 150) * 100;
+    var radonpercent = (sensorData[0].rd / 150) * 100;
+    var ozonepercent = (sensorData[0].oz / 150) * 100;
+    
+    
+    
+
+    $("#container").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        /*햄버거 박스 exporting: {
+            enabled: false  
+        },*/
+        credits:{
+            enabled : false
+        },
+        title: {
+            text: '미세먼지',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 100,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:pm10percent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });
+
+    $("#container2").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: '초미세먼지',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 90,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true,
+                y: 80
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:pm25percent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });
+
+    $("#container3").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: '이산화탄소',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 90,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true,
+                y: 80
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:co2percent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });  
+
+    $("#container4").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: 'TVOC',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 90,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true,
+                y: 80
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:tvocpercent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });  
+
+    $("#container5").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: '라돈',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 90,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true,
+                y: 80
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:ozonepercent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });   
+
+    $("#container6").highcharts({
+        chart: {
+            height : 200,
+            width : 200,
+            //renderTo: ['container','container2'],
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: '오존',
+            align: 'center',
+            verticalAlign: 'top',
+            y: 10
+        },
+        colors : ['#06b0f8','#36f806','#f88b06','#f80606'],
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.scope}</b>'
+        },
+        pane: {
+            center: ['50%', '35%'],
+            size: '65%',
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+            	borderWidth: 0,
+                backgroundColor: 'none',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+		yAxis: [{
+            lineWidth: 0,
+	        min: 0,
+	        max: 90,
+            minorTickLength: 0,
+            tickLength: 0,
+            tickWidth: 0,
+	        labels: {
+	        	enabled: false
+	        },
+            title: {
+                text: '', //'<div class="gaugeFooter">46% Rate</div>',
+                useHTML: true,
+                y: 80
+            },
+	        /*plotBands: [{
+	        	from: 0,
+	        	to: 46,
+	        	color: 'pink',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        },{
+	        	from: 46,
+	        	to: 90,
+	        	color: 'tan',
+	        	innerRadius: '100%',
+	        	outerRadius: '0%'
+	        }],*/
+	        pane: 0,
+	        
+	    }],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: true,
+                    distance: -200,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0px 1px 2px black'
+                    }
+                },
+                startAngle: -90,
+                endAngle: 90,
+                center: ['50%', '30%']
+            },
+            gauge: {
+	    		dataLabels: {
+	    			enabled: true
+	    		},
+	    		dial: {
+	    			radius: '100%'
+	    		}
+	    	}
+        },
+     
+        series: [{
+            type: 'pie',
+            name: '범위',
+            innerSize: '50%',
+            data: [{
+                name: '좋음',
+                y: 30,
+                scope: '0~30'
+            }, {
+                name: '보통',
+                y: 50,
+                scope: '31~80'
+            }, {
+                name: '나쁨',
+                y: 70,
+                scope: '81~150'
+            }, {
+                name: '매우나쁨',
+                y: 20,
+                scope: '151~'
+            }]
+        },{
+            type: 'gauge',
+            data: [{y:radonpercent}],
+            dial: {
+                rearLength: 30
+            }
+        }],
+    });
+});
+
+</script>
+
+   <body style="overflow-x:hidden; overflow-y:auto;">
+        {{> header}}
+
+        <section>
+        <div class="section-center">
+            <!-- <div id="pie"></div> -->
+            <div class="section-left">
+                <div class="notice">
+                    <ul class="rolling">
+                        <li>
+                            <a href="#">[공지][미세먼지] 전 권역이 '좋음'∼'보통'으로 예상됨1.</a>
+                        </li>
+                        <li>
+                            <a href="#">[공지][미세먼지] 전 권역이 '좋음'∼'보통'으로 예상됨2.</a>
+                        </li>
+                        <li>
+                            <a href="#">[공지][미세먼지] 전 권역이 '좋음'∼'보통'으로 예상됨3.</a>
+                        </li>
+                        <li>
+                            <a href="#">[공지][미세먼지] 전 권역이 '좋음'∼'보통'으로 예상됨4.</a>
+                        </li>
+                        <li>
+                            <a href="#">[공지][미세먼지] 전 권역이 '좋음'∼'보통'으로 예상됨5.</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dust-semicircle-chart">
+                    <div class="alldust-title">
+                    <h2>장소별 미세먼지</h2>
+                        <select name="" id="select-class">
+                            <option value="">햇살반</option>
+                            <option value="">꽃잎반</option>
+                            <option value="">나무반</option>
+                            <option value="">낙엽반</option>
+                        </select>
+                    </div>
+                    
+                    <div class="top-chartbox">
+                        <div class="chart1">
+                        <div id="container"></div>
+                    </div>
+                    <div class="chart1">
+                        <div id="container2"></div>
+                    </div>
+                    <div class="chart1">
+                        <div id="container3"></div>
+                    </div>
+
+                    </div>
+                    
+                    <div class="middle-chartbox">
+                        <div class="chart1">
+                        <div id="container4"></div>
+                    </div>
+                    
+                    <div class="chart1">
+                        <div id="container5"></div>
+                    </div>
+
+                    <div class="chart1">
+                        <div id="container6"></div>
+                    </div>
+
+                    </div>
+                </div>
+
+                <div class="chart-selectday">
+                    <select name="" id="">
+                        <option selected value="2021">오늘</option> 
+                        <option value="2020">어제</option> 
+                        <option value="2019">1주일</option> 
+                        <option value="2018">1달</option>
+                    </select>
+                </div>
+
+                
+
+                <div class="chart-box">
+                    
+                    <div id="linechart"></div>
+                </div>
+                
+                {{!-- <div class="cosum">
+                    <img src="../img/cosum.PNG" alt="">
+                </div> --}}
+
+
+                
+        </div>
+
+            
+
+
+           
+            {{!-- <div class="notice">
+                <img src="../img/notice.PNG" alt="" width="560">
+            </div>
+            <div class="dust-kinds">
+                <div class="dust-center">
+                    <div class="dust-topcontent">
+                        <h1>햇살반 미세먼지</h1>
+                        <select name="" id="">
+                            <option selected>햇살반</option> 
+                            <option>꽃잎반</option> 
+                            <option>나무반</option> 
+                            <option>낙엽반</option>
+                        </select>
+                    </div>
+                    <div class="img-box">
+                        <figcaption>미세먼지</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>초미세먼지</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>이산화탄소</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>TVOC</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+
+                    <div class="img-box">
+                        <figcaption>라돈</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>일산화탄소</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                </div>
+                
+            </div> --}}
+            
+                
+
+
+    <aside>
+        {{!-- <div id="login-box">
+            <span>춘의 어린이집 원장님 환영합니다!</span>
+
+            <button>마이페이지</button>
+            <button>로그아웃</button>
+        </div> --}}
+        
+        <div id="weather-box">
+            <div class="weather-icon"></div>
+            <span class="nowtemp"></span>
+            <span class="weather-state">맑음</span>
+            {{!-- <svg width="64px" height="64px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style='background:url("../img/cloudy-day-1.svg") no-repeat'> --}}
+        </div>
+        
+        <div class="dust-compare">
+            <div class="external-device">
+                <img src="../img/exdevice.png" alt="">
+            </div>
+            <div class="dust-compare-center">
+                <span>외부 측정기 미세먼지 : 50</span>
+                <span style="margin-left:20px">춘의동 : 40</span>
+            </div>
+                
+        </div>
+        <div id="dust-box">
+            <h1>시군별 미세먼지 현황</h1>
+            <h5 id="send-date"></h5>
+        </div>
+    </aside>
+            
+                
+            
+                
+        </div>
+
+    </section>
+    
+    
+    <footer>
+        <div class="footer-center">
+
+        </div>
+
+    </footer>
+</body>
+
+<script>
+
+    $(function(){
+	var li = $('.rolling li');
+    var height =  $(".notice").height();
+	var num = $(".rolling li").length;
+	var max = height * num;
+	var move = 0;
+	function noticeRolling(){
+		move += height;
+		$(".rolling").animate({"top":-move},600,function(){
+			if( move >= max ){
+				$(this).css("top",0);
+				move = 0;
+			};
+		});
+	};
+	noticeRollingOff = setInterval(noticeRolling,2000);
+	$(".rolling").append($(".rolling li").first().clone());
+
+	$('.rolling li').bind("mouseover",function(){
+		clearInterval(noticeRollingOff);
+	});
+	$('.rolling li').bind("mouseout",function(){
+		noticeRollingOff = setInterval(noticeRolling,2000);
+	});
+});		
+</script>
+
+
+<script>
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+
+    var chart = c3.generate({
+    bindto: "#linechart",
+    data: {
+      x: 'times',
+      xFormat: '%m-%d %H:%M', // how the date is parsed
+      columns: [
+        ['times',
+        '01-20 09:00',
+        '01-20 10:00',
+        '01-20 11:00',
+        '01-20 12:00',
+        '01-20 13:00',
+        '01-20 14:00',
+        '01-20 15:00',
+        '01-20 16:00',
+        '01-20 17:00',
+        '01-20 18:00',
+        '01-20 19:00',
+        '01-20 20:00'],
+        ['햇살반', 30, 200, 100, 400, 150, 250, 350, 100, 150, 100, 150,30],
+        ['꽃잎반', 130, 66, 41, 100, 120, 150, 200, 130, 270, 150, 300,150],
+        ['나무반', 80, 340, 200, 500, 250, 350, 200, 150, 300, 250,180,90],
+        ['낙엽반', 50, 80, 120, 350, 210, 147, 125, 238, 318, 400, 320,200]
+      ]
+    },
+    axis: {
+        x: {
+            type: 'timeseries',
+            tick: {
+                format: '%m-%d %H:%M' // how the date is displayed
+            }
+        }
+    },
+    size: {
+        width: 800,
+        height: 300
+	  },
+    zoom: {
+        enabled: true
+    },
+    subchart : {
+        show : true
+    }
+    
+    });
+</script>
+
+</html>
+
+
+
+{{!-- <    
+regular body
+<hr/>
+
+{{> partial}}
+
+{{> partial1}}
+{{> partial2}}
+{{> partial3}}
+
+{{> partial4}}
+
+{{> partial5}}>
+ --}}
+
+

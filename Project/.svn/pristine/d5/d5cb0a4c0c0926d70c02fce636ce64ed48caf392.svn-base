@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Display a popup on hover</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+    .mapboxgl-popup {
+        max-width: 400px;
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+</style>
+<div id="map"></div>
+<script>
+	// Feature 정보
+
+var notes = [ {
+
+"id" : 100,
+
+"title" : "Hello1",
+
+"note" : "Sample Notes",
+
+"opened" : true,
+
+"longitude" : -105,
+
+"latitude" : 40
+
+}, {
+
+"id" : 101,
+
+"title" : "Hello2",
+
+"note" : "Sample Notes2",
+
+"opened" : true,
+
+"longitude" : -95,
+
+"latitude" : 45
+
+}, {
+
+"id" : 102,
+
+"title" : "Hello3",
+
+"note" : "Sample Notes3",
+
+"opened" : true,
+
+"longitude" : -101.04,
+
+"latitude" : 35.68
+
+} ]; 
+
+
+function initNotes() {
+
+var features = []; 
+
+for ( var i = 0; i < notes.length; i++) {
+
+// Feature 추가
+
+var feature = new OpenLayers.Feature.Vector(
+
+               new OpenLayers.Geometry.Point(notes[i].longitude,
+
+                              notes[i].latitude), {
+
+                       title : notes[i].title
+
+               });              
+
+
+features.push(feature); 
+
+
+// Popup 추가
+
+var buttons = "<input type='button' value='Update Note' onclick='javascript:updateNote(" + notes[i].id + ");' />"
+
+ +"<input type='button' value='Delete Note' onclick='javascript:deleteNote(" + notes[i].id + ");' />";
+
+
+var content = "<div style='font-size:.8em'><b>" + notes[i].title + "</b><br/>" + notes[i].note + "<br/>" + buttons + "</div>";                      
+
+
+popup = new OpenLayers.Popup.FramedCloud(notes[i].title,  
+
+               feature.geometry.getBounds().getCenterLonLat(),  
+
+               null, content, null, true); 
+
+map.addPopup(popup); 
+
+}  
+
+
+
+vlayer.addFeatures(features);
+
+debugNotesInfo();
+
+} 
+
+
+// 디버그 창에 현재 note를 json 문자열로 출력
+
+function debugNotesInfo() {
+
+var log = ""; 
+
+for ( var i = 0; i < notes.length; i++) {
+
+log += JSON.stringify(notes[i]);
+
+} 
+
+$("#logText").text(log);
+
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel='stylesheet' href='/css/style.css'>
+  <link rel="stylesheet" href="/css/tree.css" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+  <!-- <script src="http://map.vworld.kr/js/vworldMapInit.js.do?version=2.0&apiKey=<YourAPIKEY>"></script> -->
+  <link href="/openlayers/ol.css" rel="stylesheet">
+  <script src="/openlayers/ol.js"></script>
+
+  <script src="/js/proj4.js"></script>
+
+
+  <script type="text/javascript">
+      function showPopup(){
+        var popWidth=400;
+        var popHeight=150;
+        var x = window.screen.width/2 - popWidth/2;
+        var y = window.screen.height/2 - popHeight/2;
+        window.open("aeManager/Batchregistration", "a", "width=" +popWidth+", height="+popHeight +", left="+x+ ", top="+y);
+      }
+      function devicePopup(){
+        var popWidth=500;
+        var popHeight=300;
+        var x = window.screen.width/2 - popWidth/2;
+        var y = window.screen.height/2 - popHeight/2;
+        window.open("aeManager/Deviceregistration", "a", "width=" +popWidth+", height="+popHeight +", left="+x+ ", top="+y);
+      }
+
+
+    </script>
+
+    <style media="screen">
+    .ol-popup {
+      position: absolute;
+      background-color: white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #cccccc;
+      bottom: 12px;
+      left: -50px;
+      min-width: 280px;
+    }
+    .ol-popup:after, .ol-popup:before {
+      top: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+    .ol-popup:after {
+      border-top-color: white;
+      border-width: 10px;
+      left: 48px;
+      margin-left: -10px;
+    }
+    .ol-popup:before {
+      border-top-color: #cccccc;
+      border-width: 11px;
+      left: 48px;
+      margin-left: -11px;
+    }
+    .ol-popup-closer {
+      text-decoration: none;
+      position: absolute;
+      top: 2px;
+      right: 8px;
+    }
+    .ol-popup-closer:after {
+      content: "✖";
+    }
+    </style>
+</head>
+
+<body>
+  <header>
+    {{> header}}
+  </header>
+  {{> container0}}
+
+  {{> footer}}
+</body>
+
+
+<!-- <script src="/js/tree.js"></script>
+<script src="/js/example0.js"></script> -->
+
+
+
+<script type="text/javascript">
+
+
+$(document).ready(function(){
+  var WindowsApp;
+  var aeName= [];
+  var cntName = [];
+
+for(var i = 1; i < 4; i++){
+  console.log(i);
+  WindowsApp = "WindowsAPP" + i;
+  //AE 불러오는 ajax
+  $.ajax({
+    type : 'get',
+    url : 'http://192.168.0.118:7579/Mobius/'+WindowsApp,
+    dataType : 'json',
+    beforeSend : function(xhr){
+      xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+      xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+      xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+    },
+    async : false,
+    success : function(result){
+      $.each(result["m2m:ae"], function(key, value){
+          console.log('key:' + key + ' / ' + 'value:' + value);
+
+          if(value == WindowsApp){
+
+            aeName[i] = value;
+            // var AE_ul = document.getElementById("AE");
+            // var AE_li = document.createElement("li");
+            //
+            // AE_li.setAttribute("class", "AE"+i);
+            // // AE_li.innerHTML = value;
+            //
+            // var checkbox = document.createElement("input");
+            // checkbox.setAttribute("type", "checkbox");
+            // checkbox.setAttribute("id", "AE_ck"+i);
+            //
+            // var label = document.createElement("label");
+            // label.setAttribute("for", "AE_ck"+i);
+            // label.setAttribute("onclick", "mapSubmit("+i+")");
+            // label.innerHTML = value;
+            //
+            // AE_li.appendChild(checkbox);
+            // AE_li.appendChild(label);
+            //
+            // var CNT_ul = document.createElement("ul");
+            // CNT_ul.setAttribute("id", "CNT"+i);
+            //
+            // AE_li.appendChild(CNT_ul);
+            // AE_ul.appendChild(AE_li);
+          }
+      });
+    }
+
+
+
+  });
+
+  //Container 불러오는 ajax
+  $.ajax({
+    type : 'get',
+    url : 'http://192.168.0.118:7579/Mobius/'+WindowsApp+'/Sensor_Data',
+    dataType : 'json',
+    beforeSend : function(xhr){
+      xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+      xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+      xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+    },
+    async : false,
+    success : function(result){
+      console.log("???");
+      $.each(result["m2m:cnt"], function(key, value){
+          console.log('key:' + key + ' / ' + 'value:' + value);
+
+          if(value == 'Sensor_Data'){
+            cntName[i] = value;
+            // var CNT_ul = document.getElementById("CNT"+i);
+            //
+            // var CNT_li = document.createElement("li");
+            //
+            // CNT_li.setAttribute("class", "CNT"+i);
+            //
+            // // var checkbox = document.createElement("input");
+            // // checkbox.setAttribute("type", "checkbox");
+            // //
+            // // var label = document.createElement("label");
+            // // label.innerHTML = value;
+            // //
+            // // CNT_li.appendChild(checkbox);
+            // // CNT_li.appendChild(label);
+            // CNT_li.innerHTML = value;
+            //
+            //
+            //
+            // CNT_ul.appendChild(CNT_li);
+
+
+
+            // AE_li.appendChild(CNT_ul);
+          }
+      });
+    },
+    error : function(request, status, error ) {   // 오류가 발생했을 때 호출된다.
+      console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+    }
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* 구조 참고
+{
+  id          : "string" // node id
+  parent      : "string" // 부모 요소 이다 있을 경우 id를 없을 경우 "#"을 넣어주면 된다.
+  text        : "string" // node text
+  icon        : "string" // node icon
+  state       : {
+    opened    : boolean  // is the node open
+    disabled  : boolean  // is the node disabled
+    selected  : boolean  // is the node selected
+  },
+  li_attr     : {}  // attributes for the generated LI node
+  a_attr      : {}  // attributes for the generated A node
+}
+*/
+
+$('#tree').jstree({ 'core' : {
+  'data' : [
+     { "id" : "ajson1", "parent" : "#", "text" : "SeoulMetro", "state" : {"opened" : true}  },
+
+
+     { "id" : "1-line", "parent" : "ajson1", "text" : "1호선", "state" : {"opened" : true} },
+     { "id" : "2-line", "parent" : "ajson1", "text" : "2호선", "a_attr": {"onclick" : "lineview2(2)"}, "state" : {"opened" : true} },
+     { "id" : "3-line", "parent" : "ajson1", "text" : "3호선", "state" : {"opened" : true} },
+     { "id" : "4-line", "parent" : "ajson1", "text" : "4호선", "state" : {"opened" : true} },
+     { "id" : "5-line", "parent" : "ajson1", "text" : "5호선", "state" : {"opened" : true} },
+     { "id" : "6-line", "parent" : "ajson1", "text" : "6호선", "state" : {"opened" : true} },
+     { "id" : "7-line", "parent" : "ajson1", "text" : "7호선", "state" : {"opened" : true} },
+     { "id" : "8-line", "parent" : "ajson1", "text" : "8호선", "state" : {"opened" : true} },
+     { "id" : "9-line", "parent" : "ajson1", "text" : "9호선", "state" : {"opened" : true} },
+
+     //1호선 역
+     { "id" : "seoul", "parent" : "1-line", "text" : "서울역", "a_attr": {"onclick": "aaa(0)"}, "state" : {"opened" : true} },
+     { "id" : "guro", "parent" : "1-line", "text" : "구로역" , "state" : {"opened" : true} },
+     { "id" : "sichung", "parent" : "1-line", "text" : "시청역", "state" : {"opened" : true} },
+
+     //역마다 AE
+     { "id" : "seoul_AE", "parent" : "seoul", "text" : aeName[1], "a_attr": {"onclick": "mapSubmit(1)"} , "state" : {"opened" : true}  },
+     { "id" : "guro_AE", "parent" : "guro", "text" : "WindowsAPP1", "state" : {"opened" : true} },
+     { "id" : "sichung_AE", "parent" : "sichung", "text" : "WindowsAPP1", "state" : {"opened" : true} },
+
+     //역마다 CNT
+     { "id" : "seoul_CNT", "parent" : "seoul_AE", "text" : cntName[1], "state" : {"opened" : true} },
+     { "id" : "guro_CNT", "parent" : "guro_AE", "text" : "Sensor_Data", "state" : {"opened" : true} },
+     { "id" : "sichung_CNT", "parent" : "sichung_AE", "text" : "Sensor_Data", "state" : {"opened" : true} },
+
+     //역마다 미세먼지 데이터들...
+     { "id" : "seoul_CIN_PM2.5", "parent" : "seoul_CNT", "text" : "PM2.5 : 10" },
+     { "id" : "seoul_CIN_PM10", "parent" : "seoul_CNT", "text" : "PM10 : 25" },
+     { "id" : "seoul_CIN_CO2", "parent" : "seoul_CNT", "text" : "CO2 : 35" },
+
+
+
+     //2호선
+     { "id" : "sindorim", "parent" : "2-line", "text" : "신도림역", "state" : {"opened" : true} },
+     { "id" : "gangnam", "parent" : "2-line", "text" : "강남역", "state" : {"opened" : true} },
+     { "id" : "sadang", "parent" : "2-line", "text" : "사당역", "state" : {"opened" : true} },
+
+     { "id" : "sindorim_AE", "parent" : "sindorim", "text" : "WindowsAPP1" },
+     { "id" : "gangnam_AE", "parent" : "gangnam", "text" : "WindowsAPP1" },
+     { "id" : "sadang_AE", "parent" : "sadang", "text" : "WindowsAPP1" },
+
+  ]
+} });
+
+
+
+
+});
+
+
+ var container = document.getElementById('popup');
+ var content = document.getElementById('popup-content');
+ var closer = document.getElementById('popup-closer');
+
+ closer.onclick = function () {
+   overlay.setPosition(undefined);
+   closer.blur();
+   return false;
+ };
+
+// 지도
+var layers = {};
+layers['vworld'] = new ol.layer.Tile({
+    title : 'VWorld Gray Map',
+    visible : true,
+    type : 'base',
+    source : new ol.source.XYZ({
+        url : 'http://xdworld.vworld.kr:8080/2d/Base/201612/{z}/{x}/{y}.png'
+    })
+});
+
+
+
+
+  function aaa(su){
+    map.getView().setCenter(ol.proj.transform([lon[0], lat[0]], 'EPSG:4326', 'EPSG:3857'));
+    map.getView().setZoom(19);
+  }
+  var vectorSource_2 = new ol.source.Vector({});
+
+  var vectorLayer_2 = new ol.layer.Vector({
+    source: vectorSource_2,
+    updateWhileAnimating: true,
+    updateWhileInteracting: true,
+  });
+
+// 팝업 옵션 설정
+var overlay = new ol.Overlay({
+    element: container,
+    autoPan: true,
+    autoPanAnimation: {
+    duration: 250
+    }
+});
+
+  // 지도뿌리기
+  var map = new ol.Map({
+
+      layers : [ layers['vworld'] , vectorLayer_2],
+      overlays: [overlay],
+      target : 'v_map',
+      view : new ol.View({
+          // center: ol.proj.transform([getLongi, getLati ], 'EPSG:4326', 'EPSG:3857'),
+          center: ol.proj.fromLonLat([127.5, 36]),        // center 좌표
+          zoom: 7,                                        // 초기화면 zoom level
+          minZoom: 6,                                        // 최소 zoom level
+          maxZoom: 19                                        // 최대 zoom level
+      })
+  });
+
+  var points = [
+                [126.975502,37.56355912],
+                [126.9820588,37.56604873],
+                [126.9902027,37.56619938],
+                [126.9965174,37.56651881],
+                [127.0085363,37.56576487],
+                [127.0200411,37.56542262],
+                [127.0297877,37.56397139],
+                [127.037102	,37.56258381],
+                [127.0412293,	37.5588542],
+                [127.0447822,	37.54818593],
+                [127.0569586,	37.5446739],
+                [127.0690065,	37.5408069],
+                [127.0890038,	37.53806012],
+                [127.09452,	37.53537297],
+                [127.1047324,	37.51892291],
+                [127.10004776743492 ,37.51346542543236],
+                [127.0891701,	37.51154024],
+                [127.074265	,37.51109828],
+                [127.0580019,	37.50740002],
+                [127.0580019,	37.50740002],
+                [127.0383074,	37.50123987],
+                [127.0281564	,37.49704666],
+                [127.017314	,37.49486507],
+                [127.0105532	,37.49278795],
+                [126.9970025	,37.48127007],
+                [126.976342	,37.47641771],
+                [126.965672	,37.47635311],
+                [126.9515927	,37.48123283],
+                [126.9428121	,37.48227909],
+                [126.9289081	,37.48431955],
+                [126.9129362	,37.48753811],
+                [126.9010535	,37.48535227],
+                [126.8947756	,37.49342043],
+                [126.8910844	,37.50872664],
+                [126.8945558	,37.51825999],
+                [126.8968379	,37.5253548],
+                [126.9025906	,37.53520166],
+                [126.9151342	,37.55101338],
+                [126.9241332	,37.55674249],
+                [126.9375367	,37.55466327],
+                [126.9477049	,37.55684108],
+                [126.9547895	,37.55669232],
+                [126.9638447	,37.55952861],
+                [127.0496501	,37.566861],
+                [127.0454125	,37.570686],
+                [127.0383765	,37.57542951],
+                [127.0259353	,37.57644921],
+                [126.8829462	,37.51427045],
+                [126.8657203	,37.51255401],
+                [126.8536044	,37.51831773],
+                [126.8462353	,37.53252653]
+];
+
+
+for (var i = 0; i < points.length; i++) {
+    points[i] = ol.proj.transform(points[i], 'EPSG:4326', 'EPSG:3857');
+}
+
+var featureLine = new ol.Feature({
+    geometry: new ol.geom.LineString(points)
+});
+
+var vectorLine = new ol.source.Vector({});
+vectorLine.addFeature(featureLine);
+
+var vectorLineLayer = new ol.layer.Vector({
+    source: vectorLine,
+    visible : true,
+    style: new ol.style.Style({
+        fill: new ol.style.Fill({ color: '#00FF00', weight: 8 }),
+        stroke: new ol.style.Stroke({ color: '#00FF00', width: 6 })
+    })
+});
+
+  // vectorLineLayer.setVisible(true);
+
+map.addLayer(vectorLineLayer);
+
+
+
+  //호선 클릭 시 맵에 표기해주는 함수
+  function lineview2(line){
+    if(line === 2){
+      vectorLineLayer.setVisible(false);
+      var lon = [126.975502, 126.9820588, 126.9902027, 126.9965174 ,127.0085363];
+      var lat = [37.56355912, 37.56604873, 37.56619938, 37.56651881, 37.56576487];
+
+      for (var i = 0; i < lon.length; i++) {
+        var iconFeature = new ol.Feature({
+          geometry: new ol.geom.Point(ol.proj.transform([lon[i], lat[i]], 'EPSG:4326', 'EPSG:3857'))
+        });
+
+        var iconStyle = new ol.style.Style({
+            image: new ol.style.Icon({
+              anchor: [0.5, 0.5],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'fraction',
+              src: '/img/icon1.png',
+              crossOrigin: 'anonymous',
+            })
+          });
+          iconFeature.setStyle(iconStyle);
+          // iconFeature.set('index', '00'+i);
+          vectorSource_2.addFeature(iconFeature);
+        }
+
+
+
+        // var layerRoute = new ol.layer.Vector({
+        //   source : new ol.source.Vector({
+        //     features : [
+        //       new ol.Feature({ geometry : new ol.geom.LineString(ol.proj.transform([path], 'EPSG:4326', 'EPSG:3857'))})
+        //     ]
+        //   }),
+        //   style: [
+        //       new ol.style.Style({
+        //           stroke: new ol.style.Stroke({
+        // 					color: '#d12710',
+        // 					width: 2
+        //         })
+        //       })
+        //     ],
+        //
+        // });
+        // // lineString.setCoordinates(ol.proj.transform([path], 'EPSG:4326', 'EPSG:3857'));
+        // map.addLayer(layerRoute);
+
+        map.getView().fit(vectorLayer_2.getSource().getExtent());	// 지도상 좌표들이 다 보이는 최소크기로 이동
+    }
+  }
+
+
+
+  //호선 클릭 시 맵에 표기해주는 함수
+  function lineview(line){
+    if(line === 2){
+      var lon = [126.975502, 126.9820588, 126.9902027, 126.9965174 ,127.0085363];
+      var lat = [37.56355912, 37.56604873, 37.56619938, 37.56651881, 37.56576487];
+
+      for (var i = 0; i < lon.length; i++) {
+        var iconFeature = new ol.Feature({
+          geometry: new ol.geom.Point(ol.proj.transform([lon[i], lat[i]], 'EPSG:4326', 'EPSG:3857')),
+          line : new ol.geom.LineString(ol.proj.toLonLat([lon[i], lat[i]], 'EPSG:4326', 'EPSG:3857'))
+        });
+
+        var iconStyle = new ol.style.Style({
+            image: new ol.style.Icon({
+              anchor: [0.5, 0.5],
+              anchorXUnits: 'fraction',
+              anchorYUnits: 'fraction',
+              src: '/img/icon1.png',
+              crossOrigin: 'anonymous',
+            }),
+
+            line_style:new ol.style.Stroke({
+                color: "Yellow",
+	              width: 3
+            }),
+            fill: new ol.style.Fill({
+      	      color: "rgba(0, 0, 0, 0.1)"
+      	    })
+
+
+          });
+          iconFeature.setStyle(iconStyle);
+          // iconFeature.set('index', '00'+i);
+          vectorSource_2.addFeature(iconFeature);
+        }
+        map.getView().fit(vectorLayer_2.getSource().getExtent());	// 지도상 좌표들이 다 보이는 최소크기로 이동
+    }
+  }
+
+
+
+
+
+map.on('click', function (evt) {
+		var feature = map.forEachFeatureAtPixel(evt.pixel,
+			function (feature) {
+				return feature;
+			}
+		);
+    var coordinate = evt.coordinate;
+		if (feature) {
+      feature.get("");
+
+
+      content.innerHTML = '<p>단말기 이름 : WindwsAPP1</p><br>';
+      overlay.setPosition(coordinate);
+		}
+	});
+
+
+//
+// map.on('singleclick', function (evt) {
+//   var coordinate = evt.coordinate;
+//   // var hdms = toStringHDMS(toLonLat(coordinate));
+//
+//   content.innerHTML = '<p>You clicked here:</p><code></code>';
+//   overlay.setPosition(coordinate);
+// });
+
+// hover 효과 ------------------- -------------------
+// let hover = null;
+// map.on('pointermove', function(evt) {
+//   map.getTargetElement().style.cursor = map.hasFeatureAtPixel(evt.pixel) ? 'pointer' : '';
+//   if (hover !== null) {
+//     if(hover.get('index') == '001'){
+//       // hover.setStyle(createStyle('img/icon.png'));
+//       console.log('Hover 효과 해제');
+//     }
+//     hover = null;
+//   }
+//   map.forEachFeatureAtPixel(evt.pixel, function(f) {
+//     hover = f;
+//     return true;
+//   });
+//   if(hover){
+//     if(hover.get('index')  == '001'){
+//       var coordinate = evt.coordinate;
+//       // var hdms = toStringHDMS(toLonLat(coordinate));
+//
+//       content.innerHTML = '<p>You clicked here:</p><code></code>';
+//       overlay.setPosition(coordinate);
+//       console.log('Hover 효과');
+//       // hover.setStyle(createStyle('img/icon2.png'));
+//     }
+//   }
+// });
+
+
+
+
+// 포인트 클릭
+  function mapSubmit(cnt){
+  // get  // 이 부분은 나중에 ajax 등을 통해서 좌표 값을 json object 형태로 가져와서 data 에 넣어주면 됨.
+  var data = new Array();
+
+  var coord = new Object();
+    coord.svy_name = "사당역";
+    coord.svy_longi =  126.98162;
+    coord.svy_lati = 37.47652;
+  data.push(coord);
+var coord = new Object();
+    coord.svy_name = "강남역";
+    coord.svy_longi =  127.02755;
+    coord.svy_lati = 37.49793;
+  data.push(coord);
+  var coord = new Object();
+    coord.svy_name = "춘의역";
+    coord.svy_longi =  126.78708;
+    coord.svy_lati = 37.50366;
+  data.push(coord);
+
+  // var coord = new Object();
+  // coord.svy_name = "약진너머해수욕장";
+  // coord.svy_longi = 126.233439;
+  // coord.svy_lati = 37.180287;
+  //   data.push(coord);
+  // var coord = new Object();
+  // coord.svy_name = "떼뿌루해수욕장";
+  // coord.svy_longi = 126.175860;
+  // coord.svy_lati = 37.211874;
+  //   data.push(coord);
+  // get
+
+  svyData = data;
+  var jsonData = JSON.stringify(data) ;
+
+  addFeatures();
+  }
+
+// feature 추가
+  function addFeatures() {
+
+      var results = svyData;
+
+  var len = results.length;
+
+      var i, nm, lat, lon, geom, iconFeature, iconFeatures = [];
+
+      vectorSource.clear();	// vectorSource 초기화 (안에 들어있던 features 를 삭제
+
+  for(i=0 ; i<len ; i++){	// object 길이 만큼 반복문
+    nm = results[i].svy_name;
+    lon = results[i].svy_longi;
+    lat = results[i].svy_lati;
+
+    iconFeature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857')),
+      nm: nm,
+      lon: lon,
+      lat: lat
+    });
+
+    iconFeature.setStyle(
+      new ol.style.Style({
+        // jsp 에서는 잘 되던데.. html 로 뜯어오니.. 정상 작동을 안해서 주석처리
+        image: new ol.style.Icon({
+          anchor: [0.5, 0.95],
+          src: '/img/icon.png'
+        })
+
+        // 지도상에 찍히는 포인트 스타일 설정
+
+        /*
+        image: new ol.style.Circle({
+          fill: new ol.style.Fill({ color: [255,190,10,0.7] }),
+          stroke: new ol.style.Stroke({ color: [120,120,120,1] }),
+          radius: 6
+        })
+        */
+      })
+    );
+    iconFeatures.push(iconFeature);		// iconFeature 에 넣기. 조건문을 이용해 아이콘(포인트)를 다르게 찍어도 괜찮을듯.
+  }
+
+      vectorSource.addFeatures(iconFeatures);	// vectorSource 에 features 를 넣기.
+      // map.getView().fit(vectorLayer.getSource().getExtent());	// 지도상 좌표들이 다 보이는 최소크기로 이동
+
+      return iconFeatures;
+  }
+
+
+
+</script>
+
+</html>

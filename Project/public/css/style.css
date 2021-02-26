@@ -1,0 +1,263 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color:black;
+}
+
+*{
+  margin:0px;
+  padding:0px;
+}
+
+header{
+  width:100%;
+  height:100px;
+  text-align: center;
+}
+
+.header-inner{
+  margin:0 auto;
+  width:1800px;
+  height:100px;
+}
+
+.header-inner img{
+  width:200px;
+  float:left;
+  margin:5px;
+}
+
+.header-inner li{
+  margin-top:30px;
+  width: 150px;
+  display:inline-block;
+  padding:0 30px;
+  font-weight: bold;
+  font-size:25px;
+}
+
+
+.header-inner li a:hover{
+  color:#7e4ee9;
+}
+
+
+.body-container{
+  margin:0 auto;
+  width:1800px;
+}
+
+
+
+
+
+nav{
+  width:1800px;
+  height:250px;
+  padding: 40px 0px;
+  text-align: center;
+  background-color:antiquewhite;
+  margin:0 auto;
+}
+
+
+.nav-device {
+    width: 20%;
+    height: 40%;
+    background-color: aquamarine;
+    padding: 80px 80px;
+    margin: 0px 30px;
+    float: left;
+}
+
+.nav-device img{
+  float:left;
+  margin-right:30px;
+  margin-left: 80px;
+}
+.nav-device button{
+  display:block;
+  margin-bottom:20px;
+  font-size:20px;
+
+
+}
+
+
+
+
+
+section{
+  width:100%;
+  height:650px;
+  background-color:black;
+  margin:0 auto;
+}
+
+.button_area{
+  width:1200px;
+  height:150px;
+  background-color:red;
+  float:left;
+}
+
+.log_area{
+  width:1200px;
+  height:500px;
+  background-color:gray;
+  float:left;
+}
+
+.transaction_area{
+  width:600px;
+  height:100%;
+  background-color:yellow;
+  float:right;
+}
+
+.button_center{
+  width:500px;
+  padding : 50px 0;
+  margin : 0 auto;
+}
+
+.button_area button{
+  border-radius: 5px;
+  font-size:30px;
+  padding:0 50px;
+  margin:0 30px;
+}
+
+aside{
+  width:350px;
+  height:650px;
+  background-color:lightcyan;
+  float:left;
+  overflow: scroll;
+}
+
+#tree{
+  width:400px;
+  height:100%;
+  margin:20px auto;
+
+}
+#tree li{
+  font-size:17px;
+}
+
+main{
+  width:1450px;
+  height:650px;
+  background-color:lavender;
+  float:right;
+}
+
+
+.input-form{
+  width:80%;
+  height:500px;
+  background-color:blue;
+}
+
+.input-label{
+  padding: 20px 0px;
+  font-size:25px;
+}
+
+
+.input-form button{
+  border-radius: 5px;
+  font-size:20px;
+  padding:0 50px;
+}
+
+.tree, .tree ul {
+  padding-left: 17px;
+  font-size:23px;
+  margin-left: 10px;
+  margin-top: 15px;
+}
+.tree input[type="checkbox"] {
+  display: none;
+}
+.tree label{
+  cursor: pointer;
+}
+.tree *:before{
+  width:17px;
+  height:17px;
+  display:inline-block;
+}
+.tree input[type="checkbox"]:checked~ul {
+    display: none;
+}
+.tree li{
+  padding:5px;
+}
+
+
+
+
+
+
+
+
+footer{
+  background-color:red;
+  width:1800px;
+  height:100px;
+  margin: 0 auto;
+}
+
+
+/* 오픈레이어스 팝업 스타일 */
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 450px;
+}
+.ol-popup:after, .ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.ol-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+.ol-popup-closer {
+  text-decoration: none;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+}
+.ol-popup-closer:after {
+  content: "✖";
+}
+
+
+table th,tr,td{
+  border:1px solid black;
+}

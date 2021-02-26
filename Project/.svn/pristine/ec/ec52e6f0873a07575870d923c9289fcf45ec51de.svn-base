@@ -1,0 +1,31 @@
+
+<div class="body-container">
+  <nav>
+      <div class="nav-device">
+          <img src="../img/device.png" alt="">
+          <button type="button" name="button" onclick="devicePopup()">장치등록</button>
+          <button type="button" name="button" onclick="showPopup()">일괄등록</button>
+
+      </div>
+      <div class="nav-device">
+          안녕하세요
+      </div>
+      <div class="nav-device">
+          반갑습니다.
+      </div>
+    </nav>
+
+
+
+    <section>
+      <aside class="">
+        <div id="tree">
+
+        </div>
+      </aside>
+      <main id="v_map">
+      </main>
+    </section>
+
+
+</div>

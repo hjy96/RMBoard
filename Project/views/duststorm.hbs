@@ -1,0 +1,186 @@
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="../css/user.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    </head>
+
+    <style>
+
+        table.type11 {
+            border-collapse: separate;
+            border-spacing: 1px;
+            text-align: center;
+            line-height: 1.5;
+            margin-top:20px;
+            width : 100%;
+        }
+        table.type11 th {
+            /*width: 70px;*/
+            padding: 10px;
+            font-weight: bold;
+            /*vertical-align: top;*/
+            color: #fff;
+            background: cornflowerblue ;
+        }   
+        table.type11 td {
+            /*width: 155px;*/
+            padding: 10px;
+            /*vertical-align: top;*/
+            border: 1px solid #ccc;
+            background: #eee;
+        }
+    </style>
+
+    <script>
+        /* Javascript 샘플 코드 */
+        var xhr = new XMLHttpRequest();
+        var url = 'http://apis.data.go.kr/B552584/OzYlwsndOccrrncInforInqireSvc/getYlwsndAdvsryOccrrncInfo'; /*URL*/
+        var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; 
+        queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('json'); /**/
+        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+        queryParams += '&' + encodeURIComponent('year') + '=' + encodeURIComponent('2021'); /**/
+        xhr.open('GET', url + queryParams);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+               var jsonData = JSON.parse(this.responseText);
+               var data = jsonData["response"]["body"]["items"];
+               
+               var tbody = document.getElementsByTagName("tbody")[0];
+               $.each(data, function(key, value){
+                    var tbody_tr = document.createElement("tr");
+
+                    var cnt_td = document.createElement("td");
+                    cnt_td.innerHTML = key + 1;
+                    
+                    var tmcnt_td = document.createElement("td");
+                    tmcnt_td.innerHTML = value.tmCnt;
+
+                    var dataTime_td = document.createElement("td");
+                    dataTime_td.innerHTML = value.dataTime;
+
+                    var tmArea_td = document.createElement("td");
+                    tmArea_td.innerHTML = value.tmArea;
+
+                    tbody_tr.appendChild(cnt_td);
+                    tbody_tr.appendChild(tmcnt_td);
+                    tbody_tr.appendChild(dataTime_td);
+                    tbody_tr.appendChild(tmArea_td);
+
+                    tbody.appendChild(tbody_tr);
+
+               })
+
+            }
+        };
+
+        xhr.send('');
+
+        $(function(){
+            $("#selectYear").on('change', function(){
+                $(".type11 > tbody").empty();
+
+                var xhr = new XMLHttpRequest();
+                var url = 'http://apis.data.go.kr/B552584/OzYlwsndOccrrncInforInqireSvc/getYlwsndAdvsryOccrrncInfo'; /*URL*/
+                var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; 
+                queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('json'); /**/
+                queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+                queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+                queryParams += '&' + encodeURIComponent('year') + '=' + encodeURIComponent(this.value); /**/
+                xhr.open('GET', url + queryParams);
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        var jsonData = JSON.parse(this.responseText);
+                        var data = jsonData["response"]["body"]["items"];
+               
+                        var tbody = document.getElementsByTagName("tbody")[0];
+                        $.each(data, function(key, value){
+                            var tbody_tr = document.createElement("tr");
+
+                            var cnt_td = document.createElement("td");
+                            cnt_td.innerHTML = key + 1;
+                            
+                            var tmcnt_td = document.createElement("td");
+                            tmcnt_td.innerHTML = value.tmCnt;
+
+                            var dataTime_td = document.createElement("td");
+                            dataTime_td.innerHTML = value.dataTime;
+
+                            var tmArea_td = document.createElement("td");
+                            tmArea_td.innerHTML = value.tmArea;
+
+                            tbody_tr.appendChild(cnt_td);
+                            tbody_tr.appendChild(tmcnt_td);
+                            tbody_tr.appendChild(dataTime_td);
+                            tbody_tr.appendChild(tmArea_td);
+
+                            tbody.appendChild(tbody_tr);
+
+                        })
+
+                    }
+                };
+
+                xhr.send('');
+            });
+        });
+        
+    </script>
+    
+    <body>
+        {{> header}}
+        
+        <div class="crumbs">
+            <ol>
+                <li class="crumb"><a href="#">홈</a></li>
+                <li class="crumb"><a href="#">대기정보 예보/경보</a></li>
+                <li class="crumb">황사</li>
+            </ol>
+        </div>
+
+        <section>
+            <div class="section-center">
+                <div class="title">
+                    <h2>황사</h2>  
+                </div>  
+                <div class="cont-body">
+                    <div class="select-area">
+                        <span>년도</span>
+                        <select name="" id="selectYear">
+                            <option selected value="2021">2021</option> 
+                            <option value="2020">2020</option> 
+                            <option value="2019">2019</option> 
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="2014">2014</option>
+                            <option value="2013">2013</option>
+                            <option value="2012">2012</option>
+                            <option value="2011">2011</option>
+                        </select>
+                    </div>
+                    
+                    
+                    <table class="type11">
+                        <thead>
+                            <tr>
+                                <th>일수</th>
+                                <th>회차</th>
+                                <th style="width:100px;">일자</th>
+                                <th>황사발생지역</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>    
+                
+                
+                </div>
+
+                
+            </div>
+        </section>
+</html>

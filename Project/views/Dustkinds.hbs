@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="../css/user.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    </head>
+
+    <body>
+        {{> header}}
+        
+        <div class="crumbs">
+            <ol>
+                <li class="crumb"><a href="#">홈</a></li>
+                <li class="crumb"><a href="#">대기정보 예보/경보</a></li>
+                <li class="crumb">항목별 자료</li>
+            </ol>
+        </div>
+
+        <section>
+            <div class="section-center">
+                <div class="title">
+                    <h2>항목별 자료</h2>  
+                </div>  
+
+                <div class="select-pmyearbox">
+                <h5 class="select-caption">위치</h5>
+                    
+                    <select name="" class="select-location">
+                        <option value="햇살반">햇살반</option>
+                        <option value="꽃잎반">꽃잎반</option>
+                        <option value="나무반">나무반</option>
+                        <option value="낙엽반">낙엽반</option>
+                    </select>
+
+                    
+                    <span class="date-label">기간 선택</span>
+                        <input type="date" class="before-date">
+                        <span class="date-margin">~</span>
+                        <input type="date" class="after-date">
+                    <button class="search">조회</button>
+
+
+                </div>
+
+                <table class="type11">
+                    
+                </table>
+            </div>
+        </section>
+    </body>
+</html>

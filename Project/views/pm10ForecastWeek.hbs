@@ -1,0 +1,189 @@
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="../css/user.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        
+        <style>
+        
+
+        .table-caption{
+            width : 850px;
+            margin : 0 auto;
+            padding: 6px 25px;
+            background: #444a5a;
+            color: #fff;
+            font-size: 20px;
+            /*text-align: center;*/
+        }
+
+        .dust-table{
+            width : 900px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #ebeaea;;
+        }
+        .dust-table th{
+            padding : 10px 0;
+            border-right: 1px solid #dcdcdc;
+            text-align: center;
+            background-color: #f1efef;
+        }
+
+        .dust-table td{
+            text-align : center;
+            border-bottom: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+        }
+
+        .table-center{
+            width : 900px;
+            margin : 0 auto;
+        }
+
+        .mgt10{
+            margin-top : 10px !important;
+        }
+
+        .bgnavy-label{
+            padding: 6px 25px;
+            background: #444a5a;
+            color: #fff;
+            font-size: 20px;
+            margin-top : 40px;
+        }
+
+        .mgt30{
+            margin-top : 30px;
+            /*text-indent: 20px;*/
+        }
+
+        .today-dustbox{
+            width : 95%;
+            padding : 20px;
+            /*height : 500px;*/
+            border : 1px solid black;
+            margin-bottom: 40px;
+        }
+        .txtbox {
+            overflow: auto;
+            height: 70px;
+            margin-bottom: 15px;
+        }
+
+
+        table{
+            width : 100%;
+        }
+        thead{
+            background-color : #f5f5f5
+        }
+
+        th, td{
+            border-bottom: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+            text-align: center;
+            padding: 3px;
+            
+        }
+
+        
+
+    </style>
+    </head>
+    <body>
+        {{> header}}
+
+        <div class="crumbs">
+            <ol>
+                <li class="crumb"><a href="#">홈</a></li>
+                <li class="crumb"><a href="#">대기정보 예보/경보</a></li>
+                <li class="crumb">초미세먼지 주간예보</li>
+            </ol>
+        </div>
+
+        <section>
+            <div class="section-center">
+            <div class="table-caption">
+                대기질 전망
+            </div>
+            <div class="today-dustbox">
+                {{pm10forecast}}
+            </div>
+
+            <div class="table-caption">
+                초미세먼지(PM2.5) 농도 예보등급
+            </div>
+
+            <div class="today-dustbox">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">구분</th>
+                            <th colspan="4">수도권</th>
+                            <th colspan="2">강원권</th>
+                            <th colspan="4">충청권</th>
+                            <th colspan="3">호남권</th>
+                            <th colspan="5">영남권</th>
+                            <th>제주권</th>
+                            <th rowspan="2">신뢰도</th>
+                        </tr>
+                        <tr>
+                            <th>서울</th>
+                            <th>인천</th>
+                            <th>경기<br>북부</th>
+                            <th>경기<br>남부</th>
+                            <th>영서</th>
+                            <th>영동</th>
+                            <th>대전</th>
+                            <th>세종</th>
+                            <th>충북</th>
+                            <th>충남</th>
+                            <th>광주</th>
+                            <th>전북</th>
+                            <th>전남</th>
+                            <th>부산</th>
+                            <th>대구</th>
+                            <th>울산</th>
+                            <th>경북</th>
+                            <th>경남</th>
+                            <th>제주</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>{{date.dateplus2}}</th>
+                            {{#each datedust.dateplus2_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>{{date.dateplus3}}</th>
+                            {{#each datedust.dateplus3_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>{{date.dateplus4}}</th>
+                            {{#each datedust.dateplus4_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>{{date.dateplus5}}</th>
+                            {{#each datedust.dateplus5_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>       
+                    
+                            
+                    </tbody>
+                </table>
+                <p class="MgT10">※ 초미세먼지 일평균 농도 "낮음"은 PM2.5 농도 0∼35 ㎍/㎥이며, "높음"은 PM2.5 농도 36 ㎍/㎥ 이상입니다.</p>
+                <p class="MgT10">※ 신뢰도는 주간예보가 계속 유지될 가능성에 대한 정보입니다(높음, 보통, 낮음).</p>
+            </div>
+
+        </section>
+
+    </body>
+</html>

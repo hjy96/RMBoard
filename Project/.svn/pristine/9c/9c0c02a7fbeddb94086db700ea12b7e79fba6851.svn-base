@@ -1,0 +1,179 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color:black;
+}
+
+*{
+  margin:0px;
+  padding:0px;
+}
+
+header{
+  width:100%;
+  height:100px;
+  text-align: center;
+}
+
+.header-inner{
+  margin:0 auto;
+  width:1800px;
+  height:100px;
+}
+
+.header-inner img{
+  width:200px;
+  float:left;
+}
+
+.header-inner li{
+  margin-top:30px;
+  width: 150px;
+  display:inline-block;
+  padding:0 30px;
+  font-weight: bold;
+  font-size:25px;
+}
+
+
+.header-inner li a:hover{
+  color:#7e4ee9;
+}
+
+
+.body-container{
+  margin:0 auto;
+}
+
+
+
+
+
+nav{
+  width:1800px;
+  height:250px;
+  padding: 40px 0px;
+  text-align: center;
+  background-color:antiquewhite;
+  margin:0 auto;
+}
+
+
+.nav-device {
+    width: 20%;
+    height: 40%;
+    background-color: aquamarine;
+    padding: 80px 80px;
+    margin: 0px 30px;
+    float: left;
+}
+
+.nav-device img{
+  float:left;
+  margin-right:30px;
+  margin-left: 80px;
+}
+.nav-device button{
+  display:block;
+  margin-bottom:20px;
+  font-size:20px;
+
+
+}
+
+
+
+
+
+section{
+  width:1800px;
+  height:650px;
+  background-color:black;
+  margin:0 auto;
+
+}
+
+aside{
+  width:500px;
+  height:650px;
+  background-color:lightcyan;
+  float:left;
+  overflow: scroll;
+}
+
+#tree{
+  width:400px;
+  height:100%;
+  margin:20px auto;
+
+}
+#tree li{
+  font-size:17px;
+}
+
+main{
+  width:1300px;
+  height:650px;
+  background-color:lavender;
+  float:right;
+}
+
+
+.input-form{
+  width:80%;
+  height:500px;
+  background-color:blue;
+}
+
+.input-label{
+  padding: 20px 0px;
+  font-size:25px;
+}
+
+
+.input-form button{
+  border-radius: 5px;
+  font-size:20px;
+  padding:0 50px;
+}
+
+.tree, .tree ul {
+  padding-left: 17px;
+  font-size:23px;
+  margin-left: 10px;
+  margin-top: 15px;
+}
+.tree input[type="checkbox"] {
+  display: none;
+}
+.tree label{
+  cursor: pointer;
+}
+.tree *:before{
+  width:17px;
+  height:17px;
+  display:inline-block;
+}
+.tree input[type="checkbox"]:checked~ul {
+    display: none;
+}
+.tree li{
+  padding:5px;
+}
+
+
+
+
+
+
+
+
+footer{
+  background-color:red;
+  width:1800px;
+  height:100px;
+  margin: 0 auto;
+}

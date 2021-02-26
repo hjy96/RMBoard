@@ -1,0 +1,507 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Icon Symbolizer</title>
+
+    <link href="../openlayers/ol.css" rel="stylesheet">
+    <script src="../openlayers/ol.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+
+    <style>
+        table.type11 {
+            border-collapse: separate;
+            border-spacing: 1px;
+            text-align: center;
+            line-height: 1.5;
+            margin: 20px 10px;
+        }
+        table.type11 th {
+            width: 155px;
+            padding: 10px;
+            font-weight: bold;
+            vertical-align: top;
+            color: #fff;
+            background: cornflowerblue ;
+        }   
+        table.type11 td {
+            width: 155px;
+            padding: 10px;
+            vertical-align: top;
+            border-bottom: 1px solid #ccc;
+            background: #eee;
+        }
+
+        .paging .hide {display:block;height:0;width:0;font-size:0;line-height:0;margin:0;padding:0;overflow:hidden;}
+
+        .paging{padding:19px;text-align:center;}
+
+        .paging a{display:inline-block;width:23px;height:23px;padding-top:2px;vertical-align:middle;}
+
+        .paging a:hover{text-decoration:underline;}
+
+        .paging .btn_arr{text-decoration:none;}
+
+        .paging .btn_arr, .paging .on{margin:0 3px;padding-top:0;border:1px solid #ddd; border-radius:30px;
+
+        /* background:url(/front/img/com/btn_paging.png) no-repeat; */}
+
+        .paging .on{padding-top:1px;height:22px;color:#fff;font-weight:bold;background:#000;}
+
+        .paging .on:hover{text-decoration:none;}
+
+
+    </style>
+
+<script type="text/javascript">
+    var data
+    var totalData; // 총 데이터 수
+    var dataPerPage = 100;// 한 페이지에 나타낼 데이터 수
+    var totalPage;
+    var pageCount = 10; 
+    
+
+    function paging(totalData, dataPerPage, pageCount, currentPage){
+        var count = 1; // 1페이지면 1~100 / 2페이지면 101~200 / 3페이지면 201~300
+        var curr = currentPage;
+
+        while(curr > 1){
+            count += dataPerPage;
+            curr--;
+        }
+        
+        $.ajax({
+            type : 'get',
+            url : "http://192.168.0.118:7579/Mobius/WindowsAPP2/SensorData?&rcn=4",
+            dataType : 'json',
+            beforeSend : function(xhr){
+                xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+                xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+                xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+            },
+            async : false,
+            success : function(result){
+                var a = result["m2m:rsp"];
+                totalData = a["m2m:cin"].length;
+                data = a["m2m:cin"];
+
+                console.log(data);
+                
+                for(var i = 0; i < data.length; i++){
+                    data.sort(function(a,b){
+                        return a.st - b.st;
+                    });   
+                }
+                
+                var tbody = document.getElementById('tbody');
+
+                for(count; count <= currentPage * dataPerPage; count++){
+                    var tbody_tr = document.createElement('tr');
+                
+                    var tbody_tdIMEI = document.createElement('td');
+
+                    var tbody_tdline = document.createElement('td');
+
+                    var tbody_tdstation = document.createElement('td');
+
+                    var tbody_tdlocation = document.createElement('td');
+
+                    var tbody_tdpm25 = document.createElement('td');
+
+                    var tbody_tdpm10 = document.createElement('td');
+
+                    var tbody_tdco2 = document.createElement('td');
+                    
+                    tbody_tdIMEI.innerHTML = data[count].cr;
+
+                    tbody_tdline.innerHTML = data[count].con.TerminalInfo.address[0];
+                    
+                    tbody_tdstation.innerHTML = data[count].con.TerminalInfo.address[1];
+
+                    tbody_tdlocation.innerHTML = data[count].con.TerminalInfo.address[2];
+
+                    tbody_tdpm25.innerHTML = data[count].con.dust[0];
+
+                    tbody_tdpm10.innerHTML = data[count].con.dust[1];
+
+                    tbody_tdco2.innerHTML = data[count].con.dust[2];
+
+                    tbody_tr.appendChild(tbody_tdIMEI);
+                    tbody_tr.appendChild(tbody_tdline);
+                    tbody_tr.appendChild(tbody_tdstation);
+                    tbody_tr.appendChild(tbody_tdlocation);
+                    tbody_tr.appendChild(tbody_tdpm25);
+                    tbody_tr.appendChild(tbody_tdpm10);
+                    tbody_tr.appendChild(tbody_tdco2);
+
+
+
+                    tbody.appendChild(tbody_tr);
+                }
+
+
+                // totalPage = totalData / dataPerPage;
+
+                // if(totalData % dataPerPage > 0){
+                //     totalPage++;
+                // }
+            }
+        })
+        
+        console.log("currentPage : " + currentPage);
+        
+        var totalPage = Math.ceil(totalData/dataPerPage);    // 총 페이지 수
+        var pageGroup = Math.ceil(currentPage/pageCount);    // 페이지 그룹
+        
+        console.log("pageGroup : " + pageGroup);
+        
+        var last = pageGroup * pageCount;    // 화면에 보여질 마지막 페이지 번호
+        if(last > totalPage)
+            last = totalPage;
+        var first = last - (pageCount-1);    // 화면에 보여질 첫번째 페이지 번호
+        var next = last+1;
+        var prev = first-1;
+        
+        console.log("last : " + last);
+        console.log("first : " + first);
+        console.log("next : " + next);
+        console.log("prev : " + prev);
+ 
+        var $pingingView = $("#paging");
+        
+        var html = "";
+        
+        if(prev > 0)
+            html += "<a href=# id='prev'><</a> ";
+        
+        for(var i=first; i <= last; i++){
+            html += "<a href=# id=" + i + ">" + i + "</a> ";
+        }
+        
+        if(last < totalPage)
+            html += "<a href=# id='next'>></a>";
+        
+        $("#paging").html(html);    // 페이지 목록 생성
+        $("#paging a").css("color", "black");
+        $("#paging a#" + currentPage).css({"text-decoration":"none", 
+                                           "color":"red", 
+                                           "font-weight":"bold"});    // 현재 페이지 표시
+                                           
+        $("#paging a").click(function(){
+            
+            var $item = $(this);
+            var $id = $item.attr("id");
+            var selectedPage  = $item.text();
+            console.log(selectedPage);
+            
+            if($id == "next")    selectedPage = next;
+            if($id == "prev")    selectedPage = prev;
+            
+            var cell = document.getElementById("tbody"); 
+            while ( cell.hasChildNodes() ) 
+            { cell.removeChild( cell.firstChild ); }
+
+
+            paging(totalData, dataPerPage, pageCount, selectedPage);
+        });
+                                           
+    }
+    
+    $("document").ready(function(){   
+        paging(totalData, dataPerPage, pageCount, 1);
+    });
+
+    // function setPage(page){
+    //     var tbody = document.getElementById('tbody');
+    //     while ( tbody.hasChildNodes() ) 
+    //         { tbody.removeChild( tbody.firstChild ); }
+        
+
+    //     var su = page * 20;
+    //     for(var i = 0; i < data.length; i++){
+    //         data.sort(function(a,b){
+    //             return a.st - b.st;
+    //         });   
+    //     }
+
+    //     switch(page){
+    //         case 1:
+    //             while ( tbody.hasChildNodes() ) 
+    //             { tbody.removeChild( tbody.firstChild ); }
+                
+    //             for(var i = 1; i < 21; i++){
+    //             var tbody_tr = document.createElement('tr');
+                
+    //             var tbody_tdIMEI = document.createElement('td');
+
+    //             var tbody_tdline = document.createElement('td');
+
+    //             var tbody_tdstation = document.createElement('td');
+
+    //             var tbody_tdlocation = document.createElement('td');
+
+    //             var tbody_tdpm25 = document.createElement('td');
+
+    //             var tbody_tdpm10 = document.createElement('td');
+
+    //             var tbody_tdco2 = document.createElement('td');
+
+    //             tbody_tdIMEI.innerHTML = data[i].cr;
+
+    //             tbody_tdline.innerHTML = data[i].con.TerminalInfo.address[0];
+                
+    //             tbody_tdstation.innerHTML = data[i].con.TerminalInfo.address[1];
+
+    //             tbody_tdlocation.innerHTML = data[i].con.TerminalInfo.address[2];
+
+    //             tbody_tdpm25.innerHTML = data[i].con.dust[0];
+
+    //             tbody_tdpm10.innerHTML = data[i].con.dust[1];
+
+    //             tbody_tdco2.innerHTML = data[i].con.dust[2];
+
+    //             tbody_tr.appendChild(tbody_tdIMEI);
+    //             tbody_tr.appendChild(tbody_tdline);
+    //             tbody_tr.appendChild(tbody_tdstation);
+    //             tbody_tr.appendChild(tbody_tdlocation);
+    //             tbody_tr.appendChild(tbody_tdpm25);
+    //             tbody_tr.appendChild(tbody_tdpm10);
+    //             tbody_tr.appendChild(tbody_tdco2);
+
+    //             tbody.appendChild(tbody_tr);
+
+    //             window.location.href = "/aeManager/Deviceregistration?limit=20&page="+page
+                
+    //         }
+    //     }
+
+    //     if(page == 2){
+           
+    //         for(var i = 21; i < 41; i++){
+    //             var tbody_tr = document.createElement('tr');
+                
+    //             var tbody_tdIMEI = document.createElement('td');
+
+    //             var tbody_tdline = document.createElement('td');
+
+    //             var tbody_tdstation = document.createElement('td');
+
+    //             var tbody_tdlocation = document.createElement('td');
+
+    //             var tbody_tdpm25 = document.createElement('td');
+
+    //             var tbody_tdpm10 = document.createElement('td');
+
+    //             var tbody_tdco2 = document.createElement('td');
+
+    //             tbody_tdIMEI.innerHTML = data[i].cr;
+
+    //             tbody_tdline.innerHTML = data[i].con.TerminalInfo.address[0];
+                
+    //             tbody_tdstation.innerHTML = data[i].con.TerminalInfo.address[1];
+
+    //             tbody_tdlocation.innerHTML = data[i].con.TerminalInfo.address[2];
+
+    //             tbody_tdpm25.innerHTML = data[i].con.dust[0];
+
+    //             tbody_tdpm10.innerHTML = data[i].con.dust[1];
+
+    //             tbody_tdco2.innerHTML = data[i].con.dust[2];
+
+    //             tbody_tr.appendChild(tbody_tdIMEI);
+    //             tbody_tr.appendChild(tbody_tdline);
+    //             tbody_tr.appendChild(tbody_tdstation);
+    //             tbody_tr.appendChild(tbody_tdlocation);
+    //             tbody_tr.appendChild(tbody_tdpm25);
+    //             tbody_tr.appendChild(tbody_tdpm10);
+    //             tbody_tr.appendChild(tbody_tdco2);
+
+
+
+    //             tbody.appendChild(tbody_tr);
+
+
+    //             window.location.href = "/aeManager/Deviceregistration?limit=20&page="+page
+    //         }
+    //     }
+        
+        
+        /*
+        $.each(data, function(key, value){
+                console.log(value+"ㅎㅇ");
+                
+                var tbody_tr = document.createElement('tr');
+                
+                var tbody_tdIMEI = document.createElement('td');
+
+                var tbody_tdline = document.createElement('td');
+
+                var tbody_tdstation = document.createElement('td');
+
+                var tbody_tdlocation = document.createElement('td');
+
+                var tbody_tdpm25 = document.createElement('td');
+
+                var tbody_tdpm10 = document.createElement('td');
+
+                var tbody_tdco2 = document.createElement('td');
+                
+                tbody_tdIMEI.innerHTML = value.cr;
+
+                tbody_tdline.innerHTML = value.con.TerminalInfo.address[0];
+                
+                tbody_tdstation.innerHTML = value.con.TerminalInfo.address[1];
+
+                tbody_tdlocation.innerHTML = value.con.TerminalInfo.address[2];
+
+                tbody_tdpm25.innerHTML = value.con.dust[0];
+
+                tbody_tdpm10.innerHTML = value.con.dust[1];
+
+                tbody_tdco2.innerHTML = value.con.dust[2];
+
+                tbody_tr.appendChild(tbody_tdIMEI);
+                tbody_tr.appendChild(tbody_tdline);
+                tbody_tr.appendChild(tbody_tdstation);
+                tbody_tr.appendChild(tbody_tdlocation);
+                tbody_tr.appendChild(tbody_tdpm25);
+                tbody_tr.appendChild(tbody_tdpm10);
+                tbody_tr.appendChild(tbody_tdco2);
+
+
+
+                tbody.appendChild(tbody_tr);
+        })
+        return true;
+        */
+    // }
+    
+    // $(document).ready(function(){
+    //     $.ajax({
+    //         type : 'get',
+    //         url : "http://192.168.0.118:7579/Mobius/WindowsAPP2/SensorData?&rcn=4",
+    //         dataType : 'json',
+    //         beforeSend : function(xhr){
+    //             xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+    //             xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+    //             xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+    //         },
+    //         async : false,
+            
+    //         success : function(result){
+                
+    //             var a = result["m2m:rsp"];
+    //             console.log(a);
+    //             var tbody = document.getElementById('tbody');
+                
+                
+
+    //             // var startPage = (page / pageCount) * pageCount + 1;
+
+    //             // var endPage = (page / pageCount) * pageCount + 5;
+
+                
+    //             var paging = document.getElementsByClassName('paging')[0];
+
+    //             for(var i = 1; i <= totalPage; i++){
+    //                 console.log(totalPage);
+    //                 var page = document.createElement("a");
+    //                 page.setAttribute("onclick", "setPage("+i+")");
+    //                 // page.setAttribute("href", "/aeManager/Deviceregistration?limit=20&page="+i);
+    //                  page.setAttribute("style", "cursor:pointer;");
+    //                 page.innerHTML = i;
+    //                 paging.appendChild(page);
+    //             }
+
+    //             $.each(a["m2m:cin"], function(key, value){
+    //                 console.log(value);
+    //                 // console.log(value.con.TerminalInfo.address[0]);
+                    
+    //                 var tbody_tr = document.createElement('tr');
+                    
+    //                 var tbody_tdIMEI = document.createElement('td');
+
+    //                 var tbody_tdline = document.createElement('td');
+
+    //                 var tbody_tdstation = document.createElement('td');
+
+    //                 var tbody_tdlocation = document.createElement('td');
+
+    //                 var tbody_tdpm25 = document.createElement('td');
+
+    //                 var tbody_tdpm10 = document.createElement('td');
+
+    //                 var tbody_tdco2 = document.createElement('td');
+                    
+    //                 tbody_tdIMEI.innerHTML = value.cr;
+
+    //                 tbody_tdline.innerHTML = value.con.TerminalInfo.address[0];
+                    
+    //                 tbody_tdstation.innerHTML = value.con.TerminalInfo.address[1];
+
+    //                 tbody_tdlocation.innerHTML = value.con.TerminalInfo.address[2];
+
+    //                 tbody_tdpm25.innerHTML = value.con.dust[0];
+
+    //                 tbody_tdpm10.innerHTML = value.con.dust[1];
+
+    //                 tbody_tdco2.innerHTML = value.con.dust[2];
+
+    //                 tbody_tr.appendChild(tbody_tdIMEI);
+    //                 tbody_tr.appendChild(tbody_tdline);
+    //                 tbody_tr.appendChild(tbody_tdstation);
+    //                 tbody_tr.appendChild(tbody_tdlocation);
+    //                 tbody_tr.appendChild(tbody_tdpm25);
+    //                 tbody_tr.appendChild(tbody_tdpm10);
+    //                 tbody_tr.appendChild(tbody_tdco2);
+
+
+
+    //                 tbody.appendChild(tbody_tr);
+    //             })
+    //         }
+            
+    //    })
+    // })
+
+    
+      
+    </script>
+</head>
+
+<body>
+    <div id="table-box">
+        <table class="type11">
+            <thead>
+                <th>기기 이름</th>
+                <th>설치호선</th>
+                <th>설치역</th>
+                <th>설치위치</th>
+                <th>pm2.5</th>
+                <th>pm10</th>
+                <th>Co2</th>
+            </thead>
+            <tbody id="tbody">
+                
+            </tbody>
+        </table>
+        <div id="paging">
+            <!--<a href="#" class="btn_arr first"><<</a>            
+            <a href="#" class="btn_arr prev"><</a>     
+             <a href="#" class="on">1</a><!-- D : 활성화페이지일 경우 : on 처리
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a> 
+            <a href="#" class="btn_arr next">></a>            
+            <a href="#" class="btn_arr last"><span class="hide">마지막페이지</span></a>   -->        
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+<div>Partial 4 Content</div>
+
+  {{#playerList people}}
+  {{firstname}} {{lastname}}
+  {{/playerList}}
+ 
+
+  {{#question female}}
+    <h1> woman {{female}}</h1>
+  {{else }}
+    <h1> man </h1>
+  {{/question}}
+ 
+  {{#question married}}
+    <h1>  maried {{married}}</h1>
+  {{else }}
+    <h1> maried {{married}}</h1>
+  {{/question}}
+
+

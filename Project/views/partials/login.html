@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width"/>
+
+<title>Login Demo - Kakao JavaScript SDK</title>
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.xdomainajax.js"></script>
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+
+<style>
+  table.type11 {
+      border-collapse: separate;
+      border-spacing: 1px;
+      text-align: center;
+      line-height: 1.5;
+      margin: 20px 10px;
+  }
+  table.type11 th {
+      width: 155px;
+      padding: 10px;
+      font-weight: bold;
+      vertical-align: top;
+      color: #fff;
+      background: cornflowerblue ;
+  }   
+  table.type11 td {
+      width: 155px;
+      padding: 10px;
+      vertical-align: top;
+      border-bottom: 1px solid #ccc;
+      background: #eee;
+  }
+
+  .koreadust{
+    width : 300px;
+    height: 300px;
+    text-align:center;
+  }
+  .koreadust div{
+    border-bottom: 1px solid darkgray;
+  }
+  
+</style>
+
+</head>
+<body>
+<a id="kakao-login-btn"></a>
+<a href="http://developers.kakao.com/logout"></a>
+<script type='text/javascript'>
+  //<![CDATA[
+    // 사용할 앱의 JavaScript 키를 설정해 주세요.
+    Kakao.init('f276c122a72a9e8e9b5c2f13f9c917d3');  //여기서 아까 발급받은 키 중 javascript키를 사용해준다.
+    // 카카오 로그인 버튼을 생성합니다.
+    Kakao.Auth.createLoginButton({
+      container: '#kakao-login-btn',
+      success: function(authObj) {
+        alert(JSON.stringify(authObj));
+      },
+      fail: function(err) {
+         alert(JSON.stringify(err));
+      }
+    });
+  //]]>
+</script>
+
+
+ <script>
+  //  $.ajax({
+  //    url : 'http://www.kma.go.kr/weather/forecast/mid-term-rss3.jsp?stnId=108',
+  //    dataType : 'xml',
+  //    success : function(response){
+  //      console.log(response);
+  //    }
+  //  })
+  
+  // 미세먼지
+
+
+  var xhr = new XMLHttpRequest();
+  var url = 'http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty'; /*URL*/
+  var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+  queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('json'); /**/
+  queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1000'); /**/
+  queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+  queryParams += '&' + encodeURIComponent('sidoName') + '=' + encodeURIComponent('전국'); /**/
+  queryParams += '&' + encodeURIComponent('ver') + '=' + encodeURIComponent('1.0'); /**/
+  // console.log(url + queryParams);
+  xhr.open('GET', url + queryParams);
+  xhr.onreadystatechange = function () {
+      if (this.readyState == 4) {
+        var city = {
+          '서울' : {
+            pm10 : 0,
+            pm25 : 0,
+            pm10Avg : 0,
+            pm25Avg : 0
+          },
+          '경기' : {
+            pm10 : 0,
+            pm25 : 0,
+            pm10Avg : 0,
+            pm25Avg : 0
+          },
+          '인천' : {
+            pm10 : 0,
+            pm25 : 0,
+            pm10Avg : 0,
+            pm25Avg : 0
+          },
+          '강원' : {
+            pm10 : 0,
+            pm25 : 0,
+            pm10Avg : 0,
+            pm25Avg : 0
+          },
+          '충남' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '충북' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '경북' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '경남' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '전북' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '전남' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          '제주' : {
+            pm10 : 0,
+            pm25 : 0
+          },
+          
+          
+        }
+
+
+
+        
+        var seoulpm10Avg = 0;
+        var seoulpm25Avg = 0;  
+        
+        var jsondata = JSON.parse(this.responseText);
+          // console.log(jsondata["response"]["body"]["items"]);
+          var tbody = document.getElementById('tbody');
+
+          console.log(jsondata);
+
+          
+
+          $.each(jsondata["response"]["body"]["items"], function(key, value){
+            switch(value.sidoName){
+              case '서울':
+                city.서울.pm10 += parseInt(value.pm10Value);
+                city.서울.pm25 += parseInt(value.pm25Value);
+                break;
+              case '경기':
+                city.경기.pm10 += parseInt(value.pm10Value);
+                city.경기.pm25 += parseInt(value.pm25Value);
+
+                
+                break;
+              case '인천':
+                city.인천.pm10 += parseInt(value.pm10Value);
+                city.인천.pm25 += parseInt(value.pm25Value);
+                break;
+              case '강원':
+                city.강원.pm10 += parseInt(value.pm10Value);
+                city.강원.pm25 += parseInt(value.pm25Value);
+                break;                
+              case '충남':
+                city.충남.pm10 += parseInt(value.pm10Value);
+                city.충남.pm25 += parseInt(value.pm25Value);
+                break;
+              case '충북':
+                city.충북.pm10 += parseInt(value.pm10Value);
+                city.충북.pm25 += parseInt(value.pm25Value);
+                break;
+              case '경북':
+                city.경북.pm10 += parseInt(value.pm10Value);
+                city.경북.pm25 += parseInt(value.pm25Value);
+                break;
+              case '경남':
+                city.경남.pm10 += parseInt(value.pm10Value);
+                city.경남.pm25 += parseInt(value.pm25Value);
+                break;
+              case '전북':
+                city.전북.pm10 += parseInt(value.pm10Value);
+                city.전북.pm25 += parseInt(value.pm25Value);
+                break;
+              case '전남':
+                city.전남.pm10 += parseInt(value.pm10Value);
+                city.전남.pm25 += parseInt(value.pm25Value);
+                break;
+              case '제주':
+                city.제주.pm10 += parseInt(value.pm10Value);
+                city.제주.pm25 += parseInt(value.pm25Value);
+                break;
+            }
+            
+            var tbody_tr = document.createElement('tr');
+
+            var tbody_tdsi = document.createElement('td');
+            tbody_tdsi.innerHTML = value.sidoName;
+
+            var tbody_tdgu = document.createElement('td');
+            tbody_tdgu.innerHTML = value.stationName;
+            
+            var tbody_tddate = document.createElement('td');
+            tbody_tddate.innerHTML = value.dataTime;
+
+            var tbody_tdpm10 = document.createElement('td');
+            tbody_tdpm10.innerHTML = value.pm10Value;
+
+            var tbody_tdpm25 = document.createElement('td');
+            tbody_tdpm25.innerHTML = value.pm25Value;
+            
+            tbody_tr.appendChild(tbody_tdsi);
+            tbody_tr.appendChild(tbody_tdgu);
+            tbody_tr.appendChild(tbody_tddate);
+            tbody_tr.appendChild(tbody_tdpm10);
+            tbody_tr.appendChild(tbody_tdpm25);
+
+            tbody.appendChild(tbody_tr);
+            
+           
+            
+          })
+
+          
+
+          
+
+          city.서울.pm10Avg = city.서울.pm10 / 40;
+          city.서울.pm25Avg = city.서울.pm25 / 40;
+
+          city.경기.pm10Avg = city.경기.pm10 / 119;
+          city.경기.pm25Avg = city.경기.pm25 / 119;
+
+          city.인천.pm10Avg = city.인천.pm10 / 33;
+          city.인천.pm25Avg = city.인천.pm25 / 33;
+
+          city.강원.pm10Avg = city.강원.pm10 / 31;
+          city.강원.pm25Avg = city.강원.pm25 / 31;
+
+      
+          document.getElementsByClassName("seoul")[0].innerHTML = '서울 미세먼지 : ' + Math.round(city.서울.pm10Avg) + '<br>'
+          + "서울 초미세먼지 : " + Math.round(city.서울.pm25Avg);
+          document.getElementsByClassName("gyeongi")[0].innerHTML = '경기 미세먼지 : ' + Math.round(city.경기.pm10Avg) + '<br>'
+          + "경기 초미세먼지 : " + Math.round(city.경기.pm25Avg);
+          document.getElementsByClassName("incheon")[0].innerHTML = '인천 미세먼지 : ' + Math.round(city.인천.pm10Avg) + '<br>'
+          + "인천 초미세먼지 : " + Math.round(city.인천.pm25Avg);
+          document.getElementsByClassName("gangwon")[0].innerHTML = '강원 미세먼지 : ' + Math.round(city.강원.pm10Avg) + '<br>'
+          + "강원 초미세먼지 : " + Math.round(city.강원.pm25Avg);
+
+          // document.getElementById('seoul').innerHTML = seoulpm25Avg;
+          
+          
+      }
+    
+};
+
+xhr.send('');
+  
+
+</script>
+
+ <!-- <script>
+  
+  
+  //기상청 날씨정보
+  var xhr = new XMLHttpRequest();
+  var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst'; /*URL*/
+  var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+  queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+  queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+  queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
+  queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent('20210115'); /**/
+  queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0500'); /**/
+  queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('1'); /**/
+  queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('1'); /**/
+  xhr.open('GET', url + queryParams);
+  console.log(url+queryParams);
+  xhr.onreadystatechange = function () {
+      if (this.readyState == 4) {
+          var jsondata = JSON.parse(this.responseText);
+          console.log(jsondata);
+      }
+  };
+
+  xhr.send('');
+
+</script> -->
+
+<body>
+    <form action="./login_process">
+      아이디 : <input type="text">
+      비밀번호 : <input type="password">
+      <input type="submit" value="로그인">
+      <input type="button" value="회원가입" onclick="location.href='/signup'">
+    </form>
+
+<h1>서울시 미세먼지 현황</h1>
+<table class="type11">
+  <thead>
+    <tr>
+      <th>시도명</th>
+      <th>측정소명</th>
+      <th>측정일시</th>
+      <th>미세먼지(PM10)</th>
+      <th>초미세먼지(PM2.5)</th>
+    </tr>
+  </thead>  
+  <tbody id="tbody">
+  </tbody>
+  
+
+</table>
+
+<div class="koreadust">
+  <div class="seoul"></div>
+  <div class="gyeongi"></div>
+  <div class="incheon"></div>
+  <div class="gangwon"></div>
+
+</div>
+
+
+
+<!-- <script>
+  var x = document.getElementById("demo");
+  var nxyresult, wresult; 
+  var RE = 6371.00877; // 지구 반경(km)
+      var GRID = 5.0; // 격자 간격(km)
+      var SLAT1 = 30.0; // 투영 위도1(degree)
+      var SLAT2 = 60.0; // 투영 위도2(degree)
+      var OLON = 126.0; // 기준점 경도(degree)
+      var OLAT = 38.0; // 기준점 위도(degree)
+      var XO = 43; // 기준점 X좌표(GRID)
+      var YO = 136; // 기1준점 Y좌표(GRID)
+       // LCC DFS 좌표변환 ( code : "toXY"(위경도->좌표, v1:위도, v2:경도), "toLL"(좌표->위경도,v1:x, v2:y) )
+       
+      function dfs_xy_conv(code, v1, v2) {    //위치좌표를 구역좌표(nx, ny)로 변환하는 함수
+          var DEGRAD = Math.PI / 180.0;
+          var RADDEG = 180.0 / Math.PI;
+  
+          var re = RE / GRID;
+          var slat1 = SLAT1 * DEGRAD;
+          var slat2 = SLAT2 * DEGRAD;
+          var olon = OLON * DEGRAD;
+          var olat = OLAT * DEGRAD;
+  
+          var sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+          sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+          var sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+          sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+          var ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+          ro = re * sf / Math.pow(ro, sn);
+          var rs = {};
+          if (code == "toXY") {
+              rs['lat'] = v1;
+              rs['lng'] = v2;
+              var ra = Math.tan(Math.PI * 0.25 + (v1) * DEGRAD * 0.5);
+              ra = re * sf / Math.pow(ra, sn);
+              var theta = v2 * DEGRAD - olon;
+              if (theta > Math.PI) theta -= 2.0 * Math.PI;
+              if (theta < -Math.PI) theta += 2.0 * Math.PI;
+              theta *= sn;
+              rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+              rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+          }
+          else {
+              rs['x'] = v1;
+              rs['y'] = v2;
+              var xn = v1 - XO;
+              var yn = ro - v2 + YO;
+              ra = Math.sqrt(xn * xn + yn * yn);
+              if (sn < 0.0) - ra;
+              var alat = Math.pow((re * sf / ra), (1.0 / sn));
+              alat = 2.0 * Math.atan(alat) - Math.PI * 0.5;
+  
+              if (Math.abs(xn) <= 0.0) {
+                  theta = 0.0;
+              }
+              else {
+                  if (Math.abs(yn) <= 0.0) {
+                      theta = Math.PI * 0.5;
+                      if (xn < 0.0) - theta;
+                  }
+                  else theta = Math.atan2(xn, yn);
+              }
+              var alon = theta / sn + olon;
+              rs['lat'] = alat * RADDEG;
+              rs['lng'] = alon * RADDEG;
+          }
+          return rs;
+      }
+  function getWeather() { 
+          var reh, t3h; 
+  nxyresult = dfs_xy_conv("toXY",lat, lng);
+  $.getJSON("/weather?nx="+nxyresult['x']+"&ny="+nxyresult['y'], function (data) { 
+        var datalist = JSON.parse(data); 
+           var result = datalist.response.body.items.item; 
+           alert(result.length); 
+           for(var index in result){ 
+             var cate = result[index]['category']; 
+             if(cate === 'REH'){    //습도
+              reh = result[index]['fcstValue']; 
+             } 
+             if(cate === 'T3H'){  // 최근 3시간동안의 기온
+              t3h = result[index]['fcstValue']; 
+             } 
+           } 
+           alert(reh+","+t3h);  
+      }); 
+          
+      }  -->
+  
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{title}}</title>
+  <link rel='stylesheet' href='/css/style.css'>
+
+</head>
+
+<body>
+  <h1>기본 레이아웃이 적용된 페이지입니다.</h1>
+
+</body>
+
+
+</html>

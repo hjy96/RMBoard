@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.full.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <style>
+
+      #table-box table th,td{
+        border : 1px solid black;
+        padding:10px;
+        border-collapse: collapse;
+      }
+      #table-box table thead tr{
+        background-color:skyblue;
+      }
+    </style>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <script>
+      var rowObj;
+      function excelExport(event){
+          var input = event.target;
+          var reader = new FileReader();
+          reader.onload = function(){
+              var fileData = reader.result;
+              var wb = XLSX.read(fileData, {type : 'binary'});
+              wb.SheetNames.forEach(function(sheetName){
+      	        rowObj =XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+                console.log(JSON.stringify(rowObj));
+
+              })
+          };
+          reader.readAsBinaryString(input.files[0]);
+      }
+
+      /*function Mobiusjson(){
+        for(var i = 0; i < 1; i++){
+          var jsonData = rowObj[i];
+          console.log(jsonData);
+        //  console.log(jsonData.기기번호+"!!");
+
+          //console.log(jsonData);
+          $.ajax({
+            type:"POST",
+            url:"http://192.168.0.118:7579/Mobius/IMEI",
+
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader("Content-type","text/json; charset=UTF-16");
+              xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+              xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+            },
+
+            //dataType: "json",
+            //contentType: 'text/json; charset=utf-8',
+            //"X-M2M-RI" : 151444645,
+            data:JSON.stringify({jsonData}),
+
+            success : function(data){
+              alert("성공적으로 전송됨")
+            },
+
+            error :function(e){
+              alert("실패");
+            }
+          });
+        }
+      }*/
+
+      function Postjson(){
+
+        var xhr=new XMLHttpRequest();
+        xhr.open('POST','http://192.168.0.118:7579/Mobius/IMEI', true);
+        xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+        xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+        xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+        xhr.onreadystatechange=function(){
+          console.log(xhr.responseText);
+        //통신 완료 && 통신 성공
+            if(xhr.readyState===4 && xhr.status===200){
+                alert("성공");
+                //document.querySelector('데이터 출력 선택자').innerHTML=xhr.responseText;
+            }
+        }
+        xhr.send(JSON.stringify({
+          "m2m:cnt": {
+              "rn": "TESTTTTTTTTTTTTTT",
+              "lbl": [
+                  {
+                      "TEST": "hello",
+                      "HI" : "하하하하하하"
+                  }
+              ]
+          }
+        }));
+      }
+
+      function getJson(){
+        var WindowsApp;
+
+        var table_box = document.getElementById("table-box");
+
+        var table = document.createElement("table");
+        // table.setAttribute("border", "1px solid black");
+        // table.setAttribute("border-collapse", "collapse");
+        var thead = document.createElement("thead");
+
+
+
+        var tbody = document.createElement("tbody");
+
+
+        var thead_tr = document.createElement("tr");
+
+        for(var i = 3; i < 6; i++){
+           let xhr=new XMLHttpRequest();
+           WindowsApp = "WindowsAPP" + i;
+        xhr.onreadystatechange=function(){
+        //통신 완료 && 통신 성공
+            if(xhr.readyState===4 && xhr.status===200){
+                var ObjectJsondata = JSON.parse(xhr.responseText); //String -> json 파싱
+                console.log(ObjectJsondata);
+
+
+
+                var tbody_tr = document.createElement("tr");
+
+                //foreach 시작=====================================================
+                //JSON데이터 수만큼 반복 key value 도출하여 테이블 제작
+                $.each(ObjectJsondata["m2m:ae"], function(key, value){
+                    console.log('key:' + key + ' / ' + 'value:' + value);
+
+                    let thead_th = document.createElement("th");
+                    thead_th.innerHTML = key;
+
+                    let tbody_td = document.createElement("td");
+                    tbody_td.innerHTML = value;
+
+                    thead_tr.appendChild(thead_th);
+                    tbody_tr.appendChild(tbody_td);
+                });
+                thead.appendChild(thead_tr);
+                tbody.appendChild(tbody_tr);
+
+                table.appendChild(thead);
+                table.appendChild(tbody)
+
+
+                table_box.appendChild(table);
+            }
+        }
+        console.log(WindowsApp);
+        xhr.open('GET','http://192.168.0.118:7579/Mobius/'+WindowsApp, true);
+        xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+        xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+        xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+        xhr.send();
+      }
+    }
+  </script>
+
+  <body>
+      <center>
+        <h2>파일을 업로드해주세요</h2>
+        <input type="file" id="excelFile" onchange="excelExport(event)" size="60"/>
+        <button id="post-button" onclick="Postjson()" type="button" name="button">전송</button>
+        <button id="post-button" onclick="getJson()" type="button" name="button">GET</button>
+      </center>
+  <div id="table-box">
+
+  </div>
+
+  </body>
+
+  <script type="text/javascript">
+
+  </script>
+</html>

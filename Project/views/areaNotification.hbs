@@ -1,0 +1,464 @@
+    <html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="../css/user.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    </head>
+    <style>
+        table.type11 {
+            border-collapse: separate;
+            border-spacing: 1px;
+            text-align: center;
+            line-height: 1.5;
+            margin-top:20px;
+            width : 100%;
+        }
+        table.type11 th {
+            /*width: 70px;*/
+            padding: 10px;
+            font-weight: bold;
+            /*vertical-align: top;*/
+            color: #fff;
+            background: cornflowerblue ;
+        }   
+        table.type11 td {
+            /*width: 155px;*/
+            padding: 10px;
+            /*vertical-align: top;*/
+            border: 1px solid #ccc;
+            background: #eee;
+        }
+    </style>
+
+    <script>
+        var data
+        var totalData; // 총 데이터 수
+        var dataPerPage = 10;// 한 페이지에 나타낼 데이터 수
+        //var totalPage;
+        var pageCount = 5; 
+
+    function paging(totalData, dataPerPage, pageCount, currentPage){
+        var count = 0; // 1페이지면 1~100 / 2페이지면 101~200 / 3페이지면 201~300
+        var curr = currentPage;
+
+        while(curr > 1){
+            count += dataPerPage;
+            curr--;
+        }
+        
+        //미세먼지 경보 API
+        var xhr = new XMLHttpRequest();
+        var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/UlfptcaAlarmInqireSvc/getUlfptcaAlarmInfo'; /*URL*/
+        var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+        queryParams += '&' + encodeURIComponent('year') + '=' + encodeURIComponent('2021'); /**/
+        queryParams += '&' + encodeURIComponent('itemCode') + '=' + encodeURIComponent(''); /**/
+        queryParams += '&' + encodeURIComponent('_returnType') + '=' + encodeURIComponent('json'); /**/
+        xhr.open('GET', url + queryParams);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                var jsonData = JSON.parse(this.responseText);
+                data = jsonData["list"];
+                totalData = data.length;
+                
+                console.log(data);
+                
+                var tbody = document.getElementById("tbody");
+                
+                for(count; count < currentPage * dataPerPage; count++){
+                    //console.log('key:' + key + ' / ' + 'value:' + value);
+                    var tbody_tr = document.createElement("tr");
+                    
+                    let tbody_th = document.createElement("th");
+                    tbody_th.innerHTML = count + 1;
+
+                    let district_td = document.createElement("td");
+                    district_td.innerHTML = data[count].districtName;
+
+                    let moveName_td = document.createElement("td");
+                    moveName_td.innerHTML = data[count].moveName;
+
+                    let itemCode_td = document.createElement("td");
+                    itemCode_td.innerHTML = data[count].itemCode;
+
+                    let issueGbn_td = document.createElement("td");
+                    issueGbn_td.innerHTML = data[count].issueGbn;
+                    
+                    let issueDate_td = document.createElement("td");
+                    issueDate_td.innerHTML = data[count].issueDate +" " + data[count].issueTime;
+                    
+                    let clearDate_td = document.createElement("td");
+                    clearDate_td.innerHTML = data[count].clearDate + " " +data[count].clearTime;
+
+                    tbody_tr.appendChild(tbody_th);
+                    tbody_tr.appendChild(district_td);
+                    tbody_tr.appendChild(moveName_td);
+                    tbody_tr.appendChild(itemCode_td);
+                    tbody_tr.appendChild(issueGbn_td);
+                    tbody_tr.appendChild(issueDate_td);
+                    tbody_tr.appendChild(clearDate_td);
+
+                    
+
+                    tbody.appendChild(tbody_tr);
+                };
+                
+                console.log("currentPage : " + currentPage);
+        
+        var totalPage = Math.ceil(totalData/dataPerPage);    // 총 페이지 수
+        var pageGroup = Math.ceil(currentPage/pageCount);    // 페이지 그룹
+        
+        console.log("pageGroup : " + pageGroup);
+        
+        var last = pageGroup * pageCount;    // 화면에 보여질 마지막 페이지 번호
+        if(last > totalPage)
+            last = totalPage;
+        var first = last - (pageCount-1);    // 화면에 보여질 첫번째 페이지 번호
+        var next = last+1;
+        var prev = first-1;
+        
+        console.log("last : " + last);
+        console.log("first : " + first);
+        console.log("next : " + next);
+        console.log("prev : " + prev);
+ 
+        var $pingingView = $("#paging");
+        
+        var html = "";
+        
+        if(prev > 0)
+            html += "<a href=# id='prev'><</a> ";
+        
+        for(var i=first; i <= last; i++){
+            html += "<a href=# id=" + i + ">" + i + "</a> ";
+        }
+        
+        if(last < totalPage)
+            html += "<a href=# id='next'>></a>";
+        
+        $("#paging").html(html);    // 페이지 목록 생성
+        $("#paging a").css("color", "black");
+        $("#paging a#" + currentPage).css({"text-decoration":"none", 
+                                           "color":"red", 
+                                           "font-weight":"bold"});    // 현재 페이지 표시
+                                           
+        $("#paging a").click(function(){
+            
+            var $item = $(this);
+            var $id = $item.attr("id");
+            var selectedPage  = $item.text();
+            console.log(selectedPage);
+            
+            if($id == "next")    selectedPage = next;
+            if($id == "prev")    selectedPage = prev;
+            
+            var cell = document.getElementById("tbody"); 
+            while ( cell.hasChildNodes() ) 
+            { cell.removeChild( cell.firstChild ); }
+
+
+            paging(totalData, dataPerPage, pageCount, selectedPage);
+        });
+                
+
+
+            }
+            
+        };
+        xhr.send('');
+
+        
+        
+        
+                                           
+    }
+    
+    $("document").ready(function(){   
+        paging(totalData, dataPerPage, pageCount, 1);
+
+        var xhr = new XMLHttpRequest();
+        var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/UlfptcaAlarmInqireSvc/getUlfptcaAlarmInfo'; /*URL*/
+        var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+        queryParams += '&' + encodeURIComponent('year') + '=' + encodeURIComponent('2021'); /**/
+        queryParams += '&' + encodeURIComponent('itemCode') + '=' + encodeURIComponent(''); /**/
+        queryParams += '&' + encodeURIComponent('_returnType') + '=' + encodeURIComponent('json'); /**/
+        xhr.open('GET', url + queryParams);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                var jsonData = JSON.parse(this.responseText);
+                var tbody = document.getElementsByClassName('year-tbody')[0];
+                
+
+                var data = jsonData['list'];
+
+                for(var i = 0; i < data.length; i++){
+                    var tbody_tr = document.createElement("tr");
+
+                    let tbody_td = document.createElement("td");
+                    tbody_td.innerHTML = i + 1;
+
+                    let district_td = document.createElement("td");
+                    district_td.innerHTML = data[i].districtName;
+
+                    let moveName_td = document.createElement("td");
+                    moveName_td.innerHTML = data[i].moveName;
+
+                    let itemCode_td = document.createElement("td");
+                    itemCode_td.innerHTML = data[i].itemCode;
+
+                    let issueGbn_td = document.createElement("td");
+                    issueGbn_td.innerHTML = data[i].issueGbn;
+                    
+                    let issueDate_td = document.createElement("td");
+                    issueDate_td.innerHTML = data[i].issueDate +" " + data[i].issueTime;
+                    
+                    let clearDate_td = document.createElement("td");
+                    clearDate_td.innerHTML = data[i].clearDate + " " +data[i].clearTime;
+
+                    tbody_tr.appendChild(tbody_td);
+                    tbody_tr.appendChild(district_td);
+                    tbody_tr.appendChild(moveName_td);
+                    tbody_tr.appendChild(itemCode_td);
+                    tbody_tr.appendChild(issueGbn_td);
+                    tbody_tr.appendChild(issueDate_td);
+                    tbody_tr.appendChild(clearDate_td);
+
+                    
+
+                    tbody.appendChild(tbody_tr);
+                }
+            }
+        };
+        xhr.send('');
+
+        
+        
+         
+
+        
+
+        
+        
+
+
+        $("#tab2").on("click", ".search", function(){
+            $(".type11 > .year-tbody").empty();
+
+            var itemCode;
+            
+            console.log($("#tab2-selectpm").val());
+
+            if($("#tab2-selectpm").val() == 1){
+                itemCode = '';
+            } 
+            else if($("#tab2-selectpm").val() == 'PM10'){
+                itemCode = 'PM10';
+            }
+            else{
+                itemCode = 'PM25';
+            }
+            
+
+
+            var xhr = new XMLHttpRequest();
+            var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/UlfptcaAlarmInqireSvc/getUlfptcaAlarmInfo'; /*URL*/
+            var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+            queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+            queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /**/
+            queryParams += '&' + encodeURIComponent('year') + '=' + encodeURIComponent($("#tab2-selectyear").val()); /**/
+            queryParams += '&' + encodeURIComponent('itemCode') + '=' + encodeURIComponent(itemCode); /**/
+            queryParams += '&' + encodeURIComponent('_returnType') + '=' + encodeURIComponent('json'); /**/
+            xhr.open('GET', url + queryParams);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    var jsonData = JSON.parse(this.responseText);
+                    var tbody = document.getElementsByClassName('year-tbody')[0];
+
+                    var data = jsonData['list'];
+
+                    for(var i = 0; i < data.length; i++){
+                        var tbody_tr = document.createElement("tr");
+
+                        let tbody_td = document.createElement("td");
+                        tbody_td.innerHTML = i + 1;
+
+                        let district_td = document.createElement("td");
+                        district_td.innerHTML = data[i].districtName;
+
+                        let moveName_td = document.createElement("td");
+                        moveName_td.innerHTML = data[i].moveName;
+
+                        let itemCode_td = document.createElement("td");
+                        itemCode_td.innerHTML = data[i].itemCode;
+
+                        let issueGbn_td = document.createElement("td");
+                        issueGbn_td.innerHTML = data[i].issueGbn;
+                        
+                        let issueDate_td = document.createElement("td");
+                        issueDate_td.innerHTML = data[i].issueDate +" " + data[i].issueTime;
+                        
+                        let clearDate_td = document.createElement("td");
+                        clearDate_td.innerHTML = data[i].clearDate + " " +data[i].clearTime;
+
+                        tbody_tr.appendChild(tbody_td);
+                        tbody_tr.appendChild(district_td);
+                        tbody_tr.appendChild(moveName_td);
+                        tbody_tr.appendChild(itemCode_td);
+                        tbody_tr.appendChild(issueGbn_td);
+                        tbody_tr.appendChild(issueDate_td);
+                        tbody_tr.appendChild(clearDate_td);
+
+                        
+
+                        tbody.appendChild(tbody_tr);
+                    }
+                }
+            };
+
+            xhr.send('');
+            
+        });
+    })
+    </script>
+
+    
+
+    <body>
+        {{> header}}
+        
+        <div class="crumbs">
+            <ol>
+                <li class="crumb"><a href="#">홈</a></li>
+                <li class="crumb"><a href="#">대기정보 예보/경보</a></li>
+                <li class="crumb">권역별 경보 현황</li>
+            </ol>
+        </div>
+
+        <section>
+            <div class="section-center">
+                <div class="title">
+                    <h2>미세먼지</h2>  
+                </div>  
+                <div class="cont-body">
+                    <!--탭 메뉴 영역 -->
+                <ul class="tabs">
+                    <li><a href="#tab1">주의보/경보 발령 내역</a></li>
+                    <li><a href="#tab2">연도별 발령현황</a></li>
+                    <li><a href="#tab3">지역별 발령현황</a></li>
+                    <li><a href="#tab4">경보기준 및 행동요령</a></li>
+                </ul>
+
+                <!--탭 콘텐츠 영역 -->
+                <div class="tab_container">
+
+                    <div id="tab1" class="tab_content">
+                        <div class="cont-data">
+                            <table class="type11">
+                                <thead>
+                                    <tr>
+                                        <th>번호</th>
+                                        <th>지역</th>
+                                        <th>권역</th>
+                                        <th>항목</th>
+                                        <th>경보단계</th>
+                                        <th>발령시간</th>
+                                        <th>해제시간</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                    
+                                </tbody>
+                            </table>
+                            <div id="paging">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab2" class="tab_content">
+                    <!--Content-->
+                    <div class="select-pmyearbox">
+                        <h5 class="select-caption">년도</h5>
+                        
+                        <select name="" id="tab2-selectyear">
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                        </select>
+
+                        <h5 class="pmselect-caption">항목</h5>
+
+                        <select name="" id="tab2-selectpm">
+                            <option value="1">전체</option>
+                            <option value="PM10">PM10</option>
+                            <option value="PM25">PM2.5</option>
+                        </select>
+                        <button class="search">조회</button>
+
+
+                    </div>
+                    
+                    <table class="type11">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>지역</th>
+                                <th>권역</th>
+                                <th>항목</th>
+                                <th>경보단계</th>
+                                <th>발령시간</th>
+                                <th>해제시간</th>
+                            </tr>
+                        </thead>
+                        <tbody class="year-tbody">
+
+                        </tbody>
+                    </table>
+
+
+                    </div>
+                    <div id="tab3" class="tab_content">
+                    <!--Content-->
+                    <h1>tab2영역</h1>
+                    ㅎㅇㅎㅇㅎㅇㅎㅇㅎㅇㅎㅇㅎㅇ
+                    </div>
+                    <div id="tab4" class="tab_content">
+                    <!--Content-->
+                    <h1>tab2영역</h1>
+                    ??????????????????????????????????
+                    </div>
+
+                </div>
+                </div>
+
+                
+            </div>
+        </section>
+        <script>
+            $(document).ready(function() {
+
+            //When page loads...
+            $(".tab_content").hide(); //Hide all content
+            $("ul.tabs li:first").addClass("active").show(); //Activate first tab
+            $(".tab_content:first").show(); //Show first tab content
+
+            //On Click Event
+            $("ul.tabs li").click(function() {
+
+                $("ul.tabs li").removeClass("active"); //Remove any "active" class
+                $(this).addClass("active"); //Add "active" class to selected tab
+                $(".tab_content").hide(); //Hide all tab content
+
+                var activeTab = $(this).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
+                $(activeTab).fadeIn(); //Fade in the active ID content
+                return false;
+            });
+
+        });
+        </script>
+    </body>
+</html>

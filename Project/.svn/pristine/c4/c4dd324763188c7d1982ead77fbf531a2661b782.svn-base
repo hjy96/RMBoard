@@ -1,0 +1,31 @@
+const express = require('express');
+const router = express.Router();
+//var debug = require('debug')('web:server');
+var debug = require('debug')('myApp:test');
+
+router.get('/', (req, res)=> {
+	res.render('aelayout', { layout : 'aelayout' });
+	// res.status(200).send('AEhome');
+});
+
+router.get('/test', (req, res)=> {
+	res.render('aelayout1', { layout : 'aelayout1' });
+	// res.status(200).send('AEhome');
+});
+
+
+router.get('/Batchregistration', (req, res)=> {
+	res.render('Batchregistration', { layout : 'Batchregistration' });
+	//res.status(200).send('AEhome');
+});
+
+router.get('/Deviceregistration', (req, res)=> {
+	res.render('Deviceregistration', { layout : 'Deviceregistration' });
+	//res.status(200).send('AEhome');
+});
+
+
+
+
+
+module.exports = router;

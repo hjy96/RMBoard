@@ -1,0 +1,533 @@
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="../css/user.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css"/>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+</head>
+
+
+
+<script>
+//시군구 미세먼지
+    var xmlData;    
+
+    var xhr = new XMLHttpRequest();
+    var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getCtprvnMesureSidoLIst'; /*URL*/
+    var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('31'); /**/
+    queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+    queryParams += '&' + encodeURIComponent('sidoName') + '=' + encodeURIComponent('경기'); /**/
+    queryParams += '&' + encodeURIComponent('searchCondition') + '=' + encodeURIComponent('HOUR'); /**/
+    xhr.open('GET', url + queryParams);
+    xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            xmlData = this.responseText;
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xmlData,"text/xml");
+
+            xmlItems = xmlDoc.getElementsByTagName("item");
+
+            var dustBox = document.getElementById("dust-box");
+            
+            var sendDate = xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("dataTime")[0].childNodes[0].nodeValue;
+
+            document.getElementById("send-date").innerText = sendDate;
+            
+
+            for(var i = 0 ; i < xmlItems.length; i++){
+                console.log(xmlItems[i]);
+                console.log(xmlItems[i].getElementsByTagName("cityName")[0]);
+
+                var dustBoxPtag10 = document.createElement("p");
+                var dustBoxPtag25 = document.createElement("p");
+
+                var pm10Span = document.createElement("span");
+         
+                var pm25Span = document.createElement("span");
+
+                var siName = xmlItems[i].getElementsByTagName("cityName")[0].childNodes[0].nodeValue; //시 이름
+                var pm10Value = xmlItems[i].getElementsByTagName("pm10Value")[0].childNodes[0].nodeValue; //미세먼지 값
+                var pm25Value = xmlItems[i].getElementsByTagName("pm25Value")[0].childNodes[0].nodeValue //초미세먼지 값
+
+                if(pm10Value > 0 && pm10Value <= 30){
+                    pm10Span.setAttribute("style", "color:blue");
+                }
+                else if(pm10Value > 30 && pm10Value <= 80){
+                    pm10Span.setAttribute("style", "color: #20f50c");
+                }
+                else if(pm10Value > 80 && pm10Value <= 150){
+                    pm10Span.setAttribute("style", "color:#fd7607");
+                }
+                else{
+                    pm10Span.setAttribute("style", "color:red");
+                }
+
+                if(pm25Value > 0 && pm25Value <= 15){
+                    pm25Span.setAttribute("style", "color:blue");
+                }
+                else if(pm25Value > 15 && pm25Value <= 35){
+                    pm25Span.setAttribute("style", "color: #20f50c");
+                }
+                else if(pm25Value > 35 && pm25Value <= 75){
+                    pm25Span.setAttribute("style", "color:#fd7607");
+                }
+                else{
+                    pm25Span.setAttribute("style", "color:red");
+                }
+                dustBoxPtag10.innerText = siName+ " 미세먼지 : ";
+                pm10Span.innerText = pm10Value;
+                dustBoxPtag25.innerText += " 초미세먼지 : ";
+                pm25Span.innerText = pm25Value;
+
+                
+                // + pm10Value+" 초미세먼지 : " +pm25Value;
+                
+                
+                dustBoxPtag10.appendChild(pm10Span);
+                dustBoxPtag25.appendChild(pm25Span);
+                dustBox.appendChild(dustBoxPtag10);
+                dustBox.appendChild(dustBoxPtag25);
+            }
+            
+        }
+    };
+
+    xhr.send('');
+
+</script>
+
+
+
+
+<script>
+    // (사용 예)
+    //<!--
+    //
+    // LCC DFS 좌표변환을 위한 기초 자료
+    //
+    var RE = 6371.00877; // 지구 반경(km)
+    var GRID = 5.0; // 격자 간격(km)
+    var SLAT1 = 30.0; // 투영 위도1(degree)
+    var SLAT2 = 60.0; // 투영 위도2(degree)
+    var OLON = 126.0; // 기준점 경도(degree)
+    var OLAT = 38.0; // 기준점 위도(degree)
+    var XO = 43; // 기준점 X좌표(GRID)
+    var YO = 136; // 기1준점 Y좌표(GRID)
+    //
+    // LCC DFS 좌표변환 ( code : "toXY"(위경도->좌표, v1:위도, v2:경도), "toLL"(좌표->위경도,v1:x, v2:y) )
+    //
+
+
+    function dfs_xy_conv(code, v1, v2) {
+        var DEGRAD = Math.PI / 180.0;
+        var RADDEG = 180.0 / Math.PI;
+
+        var re = RE / GRID;
+        var slat1 = SLAT1 * DEGRAD;
+        var slat2 = SLAT2 * DEGRAD;
+        var olon = OLON * DEGRAD;
+        var olat = OLAT * DEGRAD;
+
+        var sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+        var sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+        var ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+        ro = re * sf / Math.pow(ro, sn);
+        var rs = {};
+        if (code == "toXY") {
+            rs['lat'] = v1;
+            rs['lng'] = v2;
+            var ra = Math.tan(Math.PI * 0.25 + (v1) * DEGRAD * 0.5);
+            ra = re * sf / Math.pow(ra, sn);
+            var theta = v2 * DEGRAD - olon;
+            if (theta > Math.PI) theta -= 2.0 * Math.PI;
+            if (theta < -Math.PI) theta += 2.0 * Math.PI;
+            theta *= sn;
+            rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+            rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+            
+        }
+        else {
+            rs['x'] = v1;
+            rs['y'] = v2;
+            var xn = v1 - XO;
+            var yn = ro - v2 + YO;
+            ra = Math.sqrt(xn * xn + yn * yn);
+            if (sn < 0.0) - ra;
+            var alat = Math.pow((re * sf / ra), (1.0 / sn));
+            alat = 2.0 * Math.atan(alat) - Math.PI * 0.5;
+
+            if (Math.abs(xn) <= 0.0) {
+                theta = 0.0;
+            }
+            else {
+                if (Math.abs(yn) <= 0.0) {
+                    theta = Math.PI * 0.5;
+                    if (xn < 0.0) - theta;
+                }
+                else theta = Math.atan2(xn, yn);
+            }
+            var alon = theta / sn + olon;
+            rs['lat'] = alat * RADDEG;
+            rs['lng'] = alon * RADDEG;
+        }
+        return rs;
+    }
+
+    
+    //현재 위치 위도 경도 x,y좌표로 바꾼 뒤 현재 날짜 구하고 기상청 날씨 API 호출 하는 함수
+    function getLocation() {
+        if (navigator.geolocation) { // GPS를 지원하면
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var rs = dfs_xy_conv("toXY",position.coords.latitude, position.coords.longitude);
+                
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1; //January is 0!
+                var yyyy = today.getFullYear();
+
+                var hours = today.getHours();
+                var minutes = today.getMinutes();
+                
+                
+                if(minutes < 10){
+                    minutes = '0' + minutes;
+                }
+
+                if(dd<10) {
+                    dd='0'+dd
+                } 
+
+                if(mm<10) {
+                    mm='0'+mm
+                } 
+                today = yyyy+mm+dd;
+
+                console.log(hours +":"+ minutes);
+
+                /* 기상청 날씨 API */
+                var xhr = new XMLHttpRequest();
+                var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst'; /*URL*/
+                var queryParams = '?' + encodeURIComponent('ServiceKey') + '='+'YolRlNz%2F3YtnWBOWQZwKIlXQwbxncJEXT43EbxJh1Qpzc5kGl9S8Iu2uT5Q8ODrAK52CFbZNIaxZAEBGccu0iA%3D%3D'; /*Service Key*/
+                queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+                queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('225'); /**/
+                queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
+                queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(String(today)); /**/
+                queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0200'); /**/
+                queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(rs.x); /**/
+                queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(rs.y); /**/
+                xhr.open('GET', url + queryParams);
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+
+                        var weatherBox = document.getElementById("weather-box");
+                        
+                        var spanmintemp = document.createElement("span");
+
+                        var spanmaxtemp = document.createElement("span");
+
+                        var spannowtemp = document.createElement("span");
+
+                        console.log(JSON.parse(this.responseText));
+
+                        var jsonData = JSON.parse(this.responseText);
+
+                        $.each(jsonData["response"]["body"]["items"]["item"], function(key, value){
+                            if(value.category == 'TMN' && value.fcstDate == String(today)){
+                                spanmintemp.innerHTML = "최저 : "+ value.fcstValue + "℃"; //아침 최저기온
+                            }
+                            else if(value.category == 'TMX' && value.fcstDate == String(today)){
+                                spanmaxtemp.innerHTML = " 최고 : "+ value.fcstValue + "℃"; //낮 최고기온
+                            }
+                            else if(value.category == 'T3H' && value.fcstDate == String(today) && hours - parseInt(value.fcstTime.substring(0,2)) >= 0 && hours - parseInt(value.fcstTime.substring(0,2)) < 3){                                
+                                spannowtemp.innerHTML = " 현재 : "+ value.fcstValue + "℃"; //현재 기온
+                            }
+                            
+                        })
+                    
+                        weatherBox.appendChild(spanmintemp);
+                        weatherBox.appendChild(spanmaxtemp);
+                        weatherBox.appendChild(spannowtemp);    
+                    }
+                };
+                xhr.send('');
+            }, 
+            function(error) {
+                console.error(error);
+            },{
+                enableHighAccuracy: false,
+                maximumAge: 0,
+                timeout: Infinity
+            });
+        } else {
+            alert('GPS를 지원하지 않습니다');
+        }
+    }
+    getLocation();
+
+    
+    
+    
+    
+</script>
+
+<body>
+    <header>
+        <div class="header-bg">
+            <div class="header-content">
+                <div class="header-logo">
+                    <img src="../img/logo.png" alt="">
+                </div>
+                
+                <div class="header-nav">
+                    <div class="header-nav-center">
+                        <ul>
+                            <li><a href="#">설정</a>
+                                <ul class="dropdown">
+                                    <li><a href="#">Site & User</a></li>
+                                    <li><a href="#">단말기</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">대기정보 예보/경보</a>
+                              <ul class="dropdown">
+                                <li><a href="./Atmospheric">대기 정보 예보</a></li>
+                                <li><a href="#">초미세먼지 주간 예보</a></li>
+                                <li><a href="#">권역별 경보 현황</a></li>
+                                <li><a href="#">황사</a></li>
+                              </ul>
+                            </li>
+                            <li><a href="#">사이트 측정 자료실</a>
+                                <ul class="dropdown">
+                                    <li><a href="#">설치 위치별 자료</a></li>
+                                    <li><a href="#">항목별 자료</a></li>
+                                    <li><a href="#">대기 분석 정보</a></li>
+                                  </ul>
+                            </li>
+                            <li><a href="#">커뮤니티</a>
+                                <ul class="dropdown">
+                                    <li><a href="#">공지사항</a></li>
+                                    <li><a href="#">문의사항</a></li>
+                                  </ul>
+                            </li>
+                          </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </header>
+
+    <section>
+        <div class="section-center">
+            <!-- <div id="pie"></div> -->
+            <div class="section-left">
+                <div class="chart-box">
+                    <div id="linechart"></div>
+                </div>
+                
+                <div class="cosum">
+                    <img src="../img/cosum.PNG" alt="">
+    
+                </div>
+
+            </div>
+
+
+           
+            <div class="notice">
+                <img src="../img/notice.PNG" alt="" width="560">
+            </div>
+            <div class="dust-kinds">
+                <div class="dust-center">
+                    <div class="dust-topcontent">
+                        <h1>햇살반 미세먼지</h1>
+                        <select name="" id="">
+                            <option selected>햇살반</option> 
+                            <option>꽃잎반</option> 
+                            <option>나무반</option> 
+                            <option>낙엽반</option>
+                        </select>
+                    </div>
+                    <div class="img-box">
+                        <figcaption>미세먼지</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>초미세먼지</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>이산화탄소</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>TVOC</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+
+                    <div class="img-box">
+                        <figcaption>라돈</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                    <div class="img-box">
+                        <figcaption>일산화탄소</figcaption>
+                        <img src="../img/banwon1.PNG" alt="">
+                    </div>
+                </div>
+                
+            </div>
+            
+                
+
+
+            
+            
+                
+            
+                
+        </div>
+
+    </section>
+    <aside>
+        <div id="login-box">
+            <span>춘의 어린이집 원장님 환영합니다!</span>
+
+            <button>마이페이지</button>
+            <button>로그아웃</button>
+        </div>
+        
+        <div id="weather-box">
+            <h1>현재 위치 날씨</h1>    
+        </div>
+        <div id="dust-box">
+            <h1>시군별 미세먼지 현황</h1>
+            <h5 id="send-date"></h5>
+        </div>
+    </aside>
+    
+    <footer>
+        <div class="footer-center">
+
+        </div>
+
+    </footer>
+</body>
+
+<script>
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+
+    var chart = c3.generate({
+    bindto: "#linechart",
+    data: {
+      x: 'times',
+      xFormat: '%m-%d %H:%M', // how the date is parsed
+      columns: [
+        ['times',
+        '01-20 09:00',
+        '01-20 10:00',
+        '01-20 11:00',
+        '01-20 12:00',
+        '01-20 13:00',
+        '01-20 14:00',
+        '01-20 15:00',
+        '01-20 16:00',
+        '01-20 17:00'],
+        ['햇살반', 30, 200, 100, 400, 150, 250, 350, 100, 150],
+        ['꽃잎반', 130, 66, 41, 100, 120, 150, 200, 130, 270],
+        ['나무반', 80, 340, 200, 500, 250, 350, 200, 150, 300],
+        ['낙엽반', 50, 80, 120, 350, 210, 147, 125, 238, 318]
+      ]
+    },
+    axis: {
+        x: {
+            type: 'timeseries',
+            tick: {
+                format: '%m-%d %H:%M' // how the date is displayed
+            }
+        }
+    },
+    size: {
+        width: 700,
+        height: 350
+	    
+	  },
+    zoom: {
+        enabled: true
+    }
+    
+    });
+</script>
+
+
+
+
+
+    <!-- 파이그래프 <script>
+        var width = 450,
+            height = 450,
+            outerRadius = Math.min(width, height) / 2,
+            innerRadius = outerRadius * .5,
+            color = d3.scale.category20();
+        
+        var dataset = [
+            {name : '동화약품' , value : 238500},
+            {name : 'CJ대한통운' , value : 160500},
+            {name : '두산' , value : 100500},
+            {name : '대림산업' , value : 99900},
+            {name : '삼양홀딩스' , value : 78100}
+        ];
+
+        var vis = d3.select("#pie")
+                    .append("svg:svg")
+                    .attr("width", width)
+                    .attr("height",height)
+                    .append("svg:g")
+                    .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
+                    .data([dataset]);
+        
+        var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+
+        var pie = d3.layout.pie().value(function(d) { return d.value;})
+
+        var arcs = vis.selectAll("g.slice")
+                        .data(pie)
+                        .enter()
+                        .append("svg:g")
+                        .attr("class", "slice");
+        
+        arcs.append("svg:path")
+            .attr("d", arc)
+            .attr("fill", function(d,i){ return color(i); });
+
+        arcs.append("svg:text")
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" +angle(d) + ")";})
+            .text(function(d) { return d.data.name; });
+
+        function angle(d){
+            var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+            return a > 90 ? a - 180: a;
+        }
+
+        vis.append("svg:text")
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .text("주식")
+            .attr("class", "title");
+        
+    </script> -->
+
+</html>
+

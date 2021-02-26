@@ -1,0 +1,30 @@
+{
+  "name": "seoulmetro",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "pm2 start ./bin/www",
+    "test": " nodemon ./bin/www -e js,hbs"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.5",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-handlebars": "^5.2.1",
+    "file-stream-rotator": "^0.5.7",
+    "hbs": "~4.0.4",
+    "http-errors": "~1.6.3",
+    "mongoose": "^5.11.8",
+    "morgan": "~1.9.1",
+    "node-cron": "^2.0.3",
+    "request": "^2.88.2"
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

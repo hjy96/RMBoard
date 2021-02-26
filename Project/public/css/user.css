@@ -1,0 +1,507 @@
+body{
+    margin : 0;
+    font-family: 'Nanum Gothic', sans-serif;
+    color :#404040;
+}
+
+header{
+    position: relative;
+    background-color: #fff;
+    z-index : 2000;
+}
+
+.header-toparea{
+    height : 50px;
+    width : 1200px;
+    margin : 0 auto;
+}
+
+.header-bg{
+    height: 60px;
+    background-color : #0050a3;
+    position: relative;
+}
+
+.header-content{
+    width : 1200px;
+    margin :0 auto;
+    background-color :#e4e8eb;
+    height: 100%;
+}
+
+.header-logo{
+    width : 300px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    float:left;
+}
+
+.header-logo img{
+    background-size: contain;
+    width: 300px;
+    height : 45px;
+}
+
+.util {
+    float: right;
+    margin-top: 12px;
+}
+
+.util> li {
+    margin-right : 20px;
+    float:left;
+}
+
+
+.header-nav{
+    width : 1200px;
+    height : 100%;
+    float:right;
+
+    
+}
+
+.header-nav-center{
+    width : 1200px;
+    margin : 0 auto;
+    height :100%;
+}
+
+.header-nav li{
+    float: left;
+    position: relative;
+    text-decoration: none;
+}
+
+.header-nav a {
+    text-decoration: none;
+    color: #fff;
+    background: #0050a3;
+    width: 280px;
+    display:inline-block;
+    padding:0 10px;
+    font-size:16px;
+    line-height: 60px;
+    text-align: center;
+    transition-duration: 0.5s;
+    letter-spacing: -1px;
+
+}
+
+ul {
+    /* background: darkorange; */
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+  }
+  
+  /* li {
+    
+    display: block;
+    
+    padding: 1rem;
+    
+  } */
+    
+  header li a {
+    color: #fff;
+  }
+  
+  header li a:hover {
+    background: #385dc5;
+    cursor: pointer;
+    color:white
+    
+  }
+  
+  header ul li ul {
+    background: orange;
+    visibility: hidden;
+    opacity: 0;
+    min-width: 5rem;
+    position: absolute;
+    transition: all 0.5s ease;
+    /* margin-top: 1rem; */
+    left: 0;
+    display: none;
+  }
+  
+  header ul li:hover > ul,
+  header ul li ul:hover {
+    visibility: visible;
+    opacity: 1;
+    display: block;
+  }
+  
+  header ul li ul li {
+    clear: both;
+    width: 100%;
+  }
+
+.crumbs{
+    border-bottom : 1px solid #d9dbe1;
+    width : 1200px;
+    margin: 30 auto;
+    
+    
+}
+.crumbs ol {
+    list-style-type: none;
+    padding-left: 0;
+   
+}
+
+.crumb {
+    display: inline-block;
+    padding-left : 10px;
+}
+
+.crumb a::after {
+    display: inline-block;
+    color: #000;
+    content: '>';
+    font-size: 80%;
+    font-weight: bold;
+    padding-left: 15px;
+}
+
+
+section{
+    position: relative;
+}
+
+.section-center{
+    width : 900px;
+    height: 900px;
+    background-color: white;
+    margin : 0 auto;
+}
+
+.title{
+    padding-bottom: 15px;
+    background: url(https://www.airkorea.or.kr/web/images/sub/blit_tit_bot.gif) bottom repeat-x;
+    letter-spacing: -1px;
+}
+
+.title > h2{
+    padding-top: 15px;
+    font-size: 32px;
+    color: #2c2626;
+    background: url(https://www.airkorea.or.kr/web/images/sub/blit_tit.gif) left 4px top no-repeat;
+    display: inline;
+}
+
+.cont-body{
+    margin-top: 15px;
+    letter-spacing: -1px;
+}
+
+.select-area{
+    margin-top : 10px;
+    width : 100%;
+    height:60px;
+    background-color: #fafafc;
+    line-height: 60px;
+}
+
+.select-area span{
+    margin-left: 20px;
+    font-size: 20px;;
+}
+.select-area select{
+    margin-left: 7px;
+    font-size: 20px;;
+}
+
+.tabs{
+    border-bottom: 1px solid #2264bb;
+    margin-top: 45px;
+}
+
+.tabs> li.active {
+    background: #2264bb;
+    border-color: #2264bb;
+}
+
+.tabs> li {
+    padding: 10px 0;
+    width: 168px;
+    border: 1px solid #dcdcdc;
+    border-bottom: none !important;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tabs > li.active > a{
+    color: #fff;
+    list-style: none;
+    text-decoration: none;
+}
+
+.tabs > li > a{
+    color: #3e3e3e;
+    text-decoration: none;
+}
+
+.select-location{
+    width:100px;
+    margin-left : 10px;
+    padding: 4px 6px;
+    border: 1px solid #cdcdcd;
+    color: #666;
+    font-size: 13px;
+}
+
+.date-label{
+    margin-left: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 20px;
+}
+
+.date-margin{
+    margin : 0 5;
+}
+
+.select-pmyearbox{
+    width : 850px;
+    position: relative;
+    padding : 15px 25px;
+    background-color: #fafbfd;
+    border:1px solid #dcdcdc;
+    margin-top : 15px;
+}
+
+#tab2-selectyear{
+    width:100px;
+    margin-left : 40px;
+    padding: 4px 6px;
+    border: 1px solid #cdcdcd;
+    color: #666;
+    font-size: 13px;
+}
+
+#tab2-selectpm{
+    width:100px;
+    margin-left : 40px;
+    padding: 4px 6px;
+    border: 1px solid #cdcdcd;
+    color: #666;
+    font-size: 13px;
+}
+
+.select-caption{
+    /* background: url(https://www.airkorea.or.kr/web/images/sub/blit_dot_vline.png) right no-repeat; */
+    display: inline-block;
+}
+
+.search{
+    padding: 5px 15px;
+    background: #1e74d7;
+    color: #fff;
+    font-size: 14px;
+    display: inline-block;
+    width: 100px;
+    right: 60px;
+    position: absolute;
+    text-align: center;
+    cursor: pointer;
+}
+
+.pmselect-caption{
+    margin-left : 70px;
+    display: inline-block;
+}
+
+.cont-data{
+    margin-top : 40px;
+}
+
+.stroke{
+    margin-top:10px;
+}
+
+.st_1{
+    width : 100%;
+    border-top : 2px solid black
+}
+
+
+.section-left{
+    width : 800px;
+    height : 500px;
+    float:left;
+}
+
+aside{
+    position: relative;
+    width : 400px;
+    background-color : slategray;
+    height: 830px;
+    float:left;
+} 
+
+#dust-box{
+    width : 300px;
+    height : 500px;
+    background-color : white;
+    margin : 20 auto;
+    overflow: scroll;
+    border: 2px solid black;
+}
+
+.chart-box{
+    width : 700px;
+    height : 350px;
+    background-color : white;
+    float:left;
+    /* overflow: scroll; */
+}
+
+.notice{
+    width : 560px;
+    height : 134px;
+    background-color : black;
+    margin-left : 15px;
+    float:left;
+    margin-bottom: 10px;
+    border : 2px solid black;
+}
+
+.dust-kinds{
+    width : 560px;
+    height : 680px;
+    margin-left: 15;
+    background-color : lightsteelblue;
+    float:left;
+}
+
+.dust-center{
+    margin : 0 auto;
+    width : 500px;
+    height : 500px;
+}
+
+.dust-topcontent{
+    width : 500px;
+    height : 60px;
+    background-color : #f7f9fa;
+    margin-bottom : 10;
+}
+
+.dust-topcontent h1{
+    display: inline-block;
+    text-align: center;
+    width : 320px;
+    margin-top : 10;
+
+}
+.dust-topcontent select{
+    width: 150px; /* 원하는 너비설정 */ padding: .8em .5em; /* 여백으로 높이 설정 */ font-family: inherit; /* 폰트 상속 */ background: url(https://farm1.stacflickr.com/379/19928272501_4ef877c265_t.jpg) no-repeat 95% 50%; /* 네이티브 화살표 대체 */ border: 1px solid #999; border-radius: 0px; /* iOS 둥근모서리 제거 */ -webkit-appearance: none; /* 네이티브 외형 감추기 */ -moz-appearance: none; appearance: none;
+    float:right;
+    font-size : 18px;
+}
+
+figcaption {
+    width : 226px;
+    background-color: black;
+    color: white;
+    font-style: italic;
+    font-size : 20px;
+    padding: 2px;
+    text-align: center;
+}
+
+.img-box{
+    display: inline-block;
+    width: 220px;
+    height: 190px;
+    margin: 0 10px;
+}
+
+.cosum{
+    width: 800;
+    height : 334;
+    background-color : lavender;
+    float:left;
+    text-align: center;;
+}
+
+
+#login-box{
+    width : 300px;
+    margin : 0 auto;
+    height : 80px;
+    background-color : white;
+    text-align:center;
+    margin-top : 20px;
+    padding-top : 20px;
+    border : 1px solid black;
+}
+
+#login-box span{
+    font-size : 18px;
+    font-weight: bold;;
+}
+
+#login-box button{
+    margin : 15 5;
+}
+
+
+
+
+
+#dust-box p{
+    list-style: none;
+    padding-left: 10px;
+    font-size:14px;
+    display:inline-block;   
+}
+
+#dust-box span{
+    font-weight: bold;
+}
+
+#dust-box h1,h5{
+    margin: 5;
+    text-align: center;
+}
+
+
+#weather-box{
+    width : 300px;
+    height : 100px;
+    background-color: white;
+    margin : 20 auto;
+    border: 2px solid black;
+    text-align: center;
+}
+
+#weather-box h1, span{
+    margin : 10 0px;
+    
+}
+
+.header-nav li a:hover{
+    color:white;
+
+}
+
+footer{
+    position: relative;
+    background-color: #fff;
+    z-index: 2000;
+    clear: both;
+    width : 100%;
+}
+
+.footer-center{
+    width : 1800px;
+    height : 100px;
+    margin : 0 auto;
+    
+    background-color : darkblue;
+}

@@ -1,0 +1,325 @@
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="../css/user.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css"/>
+    
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+    <script type="text/x-handlebars-template" id="some-template"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
+    
+
+
+    
+    <style>
+        section{
+            position: relative;
+        }
+
+        .section-center{
+            width : 900px;
+            height: 900px;
+            background-color: white;
+            margin : 0 auto;
+        }
+
+        .table-caption{
+            width : 850px;
+            margin : 0 auto;
+            padding: 6px 25px;
+            background: #444a5a;
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .dust-table{
+            width : 900px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #ebeaea;;
+        }
+        .dust-table th{
+            padding : 10px 0;
+            border-right: 1px solid #dcdcdc;
+            text-align: center;
+            background-color: #f1efef;
+        }
+
+        .dust-table td{
+            text-align : center;
+            border-bottom: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+        }
+
+        .table-center{
+            width : 900px;
+            margin : 0 auto;
+        }
+
+        .mgt10{
+            margin-top : 10px !important;
+        }
+
+        .bgnavy-label{
+            padding: 6px 25px;
+            background: #444a5a;
+            color: #fff;
+            font-size: 20px;
+            margin-top : 40px;
+        }
+
+        .mgt30{
+            margin-top : 30px;
+            /*text-indent: 20px;*/
+        }
+
+        .today-dustbox{
+            width : 95%;
+            padding : 20px;
+            height : 500px;
+            border : 1px solid black;
+        }
+        .txtbox {
+            overflow: auto;
+            height: 70px;
+            margin-bottom: 15px;
+        }
+
+
+        table{
+            width : 100%;
+        }
+        thead{
+            background-color : #f5f5f5
+        }
+
+        th, td{
+            border-bottom: 1px solid #dcdcdc;
+            border-right: 1px solid #dcdcdc;
+            text-align: center;
+            padding: 3px;
+            
+        }
+
+        
+
+    </style>
+</head>
+
+
+
+<body>
+{{> header}}
+
+<div class="crumbs">
+    <ol>
+        <li class="crumb"><a href="#">홈</a></li>
+        <li class="crumb"><a href="#">대기정보 예보/경보</a></li>
+        <li class="crumb">대기정보예보</li>
+    </ol>
+</div>
+
+<section>
+        <div class="section-center">
+            <div class="table-caption">
+                대기질 농도 전망 | 한반도 대기질 예측모델결과
+            </div>
+            <div class="table-center">
+                <table class="dust-table">
+                <thead>
+                    <tr>
+                        <th>PM10</th>
+                        <th>PM2.5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{{dustimg_airkorea}}}
+                    {{!-- {{#each crawler}}
+                        <tr><td><img src="https://www.airkorea.or.kr/{{src}}" width="285" height="305"></td></tr>
+                    {{/each}} --}}
+                </tbody>
+            </table>
+            <p class="MgT10">※ 모델 예측 결과는 실제 관측값이 아니며 불확도를 가진 예측값으로 예보결과와 다를 수 있음.</p>
+
+            </div>
+
+            <div class="bgnavy-label">
+                미세먼지 농도 전망
+            </div>
+
+            <div class="mgt30">
+                <p>{{today}}</p>
+            </div>
+            <div class="today-dustbox">
+                <h4>예보등급</h4>
+                <div class="txtbox">
+                    {{forecast_1}}
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">구분</th>
+                            <th rowspan="2">서울</th>
+                            <th rowspan="2">인천</th>
+                            <th colspan="2">경기</th>
+                            <th colspan="2">강원</th>
+                            <th rowspan="2">대전</th>
+                            <th rowspan="2">세종</th>
+                            <th rowspan="2">충북</th>
+                            <th rowspan="2">충남</th>
+                            <th rowspan="2">광주</th>
+                            <th rowspan="2">전북</th>
+                            <th rowspan="2">전남</th>
+                            <th rowspan="2">부산</th>
+                            <th rowspan="2">대구</th>
+                            <th rowspan="2">울산</th>
+                            <th rowspan="2">경북</th>
+                            <th rowspan="2">경남</th>
+                            <th rowspan="2">제주</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">북부</th>
+                            <th scope="col">남부</th>
+                            <th scope="col">영서</th>
+                            <th scope="col">영동</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>미세먼지</th>
+                            {{#each today_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>PM10</th>
+                            {{#each today_pm10}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>PM2.5</th>
+                            {{#each today_pm25}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mgt10">※ 미세먼지 예보 등급은 PM10과 PM2.5중 높은 등급을 기준으로 발표됨.</p>
+
+                <h4 style="margin-top : 50px;">원인 분석</h4>
+                <div class="txtbox">
+                    {{forecast_2}}
+                </div>
+            </div>
+
+
+
+            {{!-- 내일 미세먼지 --}}
+            <div class="mgt30">
+                <p>{{tomorrow}}</p>
+            </div>
+            <div class="today-dustbox">
+                <h4>예보등급</h4>
+                <div class="txtbox">
+                    {{forecast_3}}
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">구분</th>
+                            <th rowspan="2">서울</th>
+                            <th rowspan="2">인천</th>
+                            <th colspan="2">경기</th>
+                            <th colspan="2">강원</th>
+                            <th rowspan="2">대전</th>
+                            <th rowspan="2">세종</th>
+                            <th rowspan="2">충북</th>
+                            <th rowspan="2">충남</th>
+                            <th rowspan="2">광주</th>
+                            <th rowspan="2">전북</th>
+                            <th rowspan="2">전남</th>
+                            <th rowspan="2">부산</th>
+                            <th rowspan="2">대구</th>
+                            <th rowspan="2">울산</th>
+                            <th rowspan="2">경북</th>
+                            <th rowspan="2">경남</th>
+                            <th rowspan="2">제주</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">북부</th>
+                            <th scope="col">남부</th>
+                            <th scope="col">영서</th>
+                            <th scope="col">영동</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>미세먼지</th>
+                            {{#each tomorrow_dust}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>PM10</th>
+                            {{#each tomorrow_pm10}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                        <tr>
+                            <th>PM2.5</th>
+                            {{#each tomorrow_pm25}}
+                                <td>{{this}}</td>
+                            {{/each}}
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mgt10">※ 미세먼지 예보 등급은 PM10과 PM2.5중 높은 등급을 기준으로 발표됨.</p>
+
+                <h4 style="margin-top : 50px;">원인 분석</h4>
+                <div class="txtbox">
+                    {{forecast_4}}
+                </div>
+            </div>
+            
+            
+                
+        </div>
+
+    </section>
+
+
+
+</body>
+
+
+{{!-- <script>
+    var source = $("#some-template").html(); 
+	var template = Handlebars.compile(source);
+    
+    $('body').append(template(data));
+</script> --}}
+
+
+
+
+<script>
+    Handlebars.registerHelper('isVowel', function(index) {
+    console.log(index)
+    return index;
+    //var regexp = /^[aeiou]/;
+    //if (regexp.test(this.name)) {
+    //    return options.fn(this);
+    //} else {
+    //    return options.inverse(this);
+    //}
+    });
+</script>
+
+
+
+</html>
+

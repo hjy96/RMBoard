@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{title}}</title>
+  <link rel='stylesheet' href='/css/style.css'>
+  <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <!-- <script src="http://map.vworld.kr/js/vworldMapInit.js.do?version=2.0&apiKey=<YourAPIKEY>"></script> -->
+  <link href="/openlayers/ol.css" rel="stylesheet">
+  <script src="/openlayers/ol.js"></script>
+
+  <script src="/js/proj4.js"></script>
+
+  <style media="screen">
+  #map {
+    width: 600px;
+    height: 400px;
+    border: 2px solid #ccc;
+  }
+  </style>
+
+
+
+
+  <script type="text/javascript">
+      function showPopup(){
+        var popWidth=400;
+        var popHeight=150;
+        var x = window.screen.width/2 - popWidth/2;
+        var y = window.screen.height/2 - popHeight/2;
+        window.open("aeManager/Batchregistration", "a", "width=" +popWidth+", height="+popHeight +", left="+x+ ", top="+y);
+      }
+      function devicePopup(){
+        var popWidth=500;
+        var popHeight=300;
+        var x = window.screen.width/2 - popWidth/2;
+        var y = window.screen.height/2 - popHeight/2;
+        window.open("aeManager/Deviceregistration", "a", "width=" +popWidth+", height="+popHeight +", left="+x+ ", top="+y);
+      }
+
+
+    </script>
+
+    <script type="text/javascript">
+      var WindowsApp;
+      $(document).ready(function(){
+      for(var i = 1; i < 3; i++){
+        WindowsApp = "WindowsAPP" + i;
+        //AE 불러오는 ajax
+        $.ajax({
+          type : 'get',
+          url : 'http://192.168.0.118:7579/Mobius/'+WindowsApp,
+          dataType : 'json',
+          beforeSend : function(xhr){
+            xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+            xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+            xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+          },
+          async : false,
+          success : function(result){
+            $.each(result["m2m:ae"], function(key, value){
+                console.log('key:' + key + ' / ' + 'value:' + value);
+
+                if(value == WindowsApp){
+                  var AE_ul = document.getElementById("AE");
+                  var AE_li = document.createElement("li");
+
+                  AE_li.setAttribute("class", "AE"+i);
+                  // AE_li.innerHTML = value;
+
+                  var checkbox = document.createElement("input");
+                  checkbox.setAttribute("type", "checkbox");
+                  checkbox.setAttribute("id", "AE_ck"+i);
+
+                  var label = document.createElement("label");
+                  label.setAttribute("for", "AE_ck"+i);
+                  label.setAttribute("onclick", "mapSubmit("+i+")");
+                  label.innerHTML = value;
+
+                  AE_li.appendChild(checkbox);
+                  AE_li.appendChild(label);
+
+                  var CNT_ul = document.createElement("ul");
+                  CNT_ul.setAttribute("id", "CNT"+i);
+
+
+
+                  AE_li.appendChild(CNT_ul);
+                  AE_ul.appendChild(AE_li);
+                }
+            });
+
+          }
+
+
+        });
+
+        //Container 불러오는 ajax
+        $.ajax({
+          type : 'get',
+          url : 'http://192.168.0.118:7579/Mobius/'+WindowsApp+'/Sensor_Data',
+          dataType : 'json',
+          beforeSend : function(xhr){
+            xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+            xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+            xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+          },
+          async : false,
+          success : function(result){
+            console.log(result);
+            $.each(result["m2m:cnt"], function(key, value){
+                console.log('key:' + key + ' / ' + 'value:' + value);
+
+                if(value == 'Sensor_Data'){
+                  var CNT_ul = document.getElementById("CNT"+i);
+
+                  var CNT_li = document.createElement("li");
+
+                  CNT_li.setAttribute("class", "CNT"+i);
+
+                  // var checkbox = document.createElement("input");
+                  // checkbox.setAttribute("type", "checkbox");
+                  //
+                  // var label = document.createElement("label");
+                  // label.innerHTML = value;
+                  //
+                  // CNT_li.appendChild(checkbox);
+                  // CNT_li.appendChild(label);
+                  CNT_li.innerHTML = value;
+
+
+
+                  CNT_ul.appendChild(CNT_li);
+
+
+
+                  // AE_li.appendChild(CNT_ul);
+                }
+            });
+
+          }
+
+
+        });
+
+
+
+
+      }
+
+    });
+/*
+      $(document).ready(
+        function getJson(){
+          var WindowsApp;
+          for(var i = 1; i < 4; i++){
+          let xhr=new XMLHttpRequest();
+          WindowsApp = "WindowsAPP" + i;
+          xhr.onreadystatechange=function(){
+          //통신 완료 && 통신 성공
+              if(xhr.readyState===4 && xhr.status===200){
+                  var ObjectJsondata = JSON.parse(xhr.responseText); //String -> json 파싱
+                  console.log(ObjectJsondata);
+
+                  //foreach 시작=====================================================
+                  //JSON데이터 수만큼 반복 key value 도출하여 테이블 제작
+                  $.each(ObjectJsondata["m2m:ae"], function(key, value){
+                      console.log('key:' + key + ' / ' + 'value:' + value);
+                      if(value === WindowsApp){
+                        console.log("ㅎㅇ");
+                      }
+                  });
+
+              }
+          }
+          xhr.open('GET','http://192.168.0.118:7579/Mobius/'+WindowsApp, true);
+          xhr.setRequestHeader("Content-type","text/json; ty=3; charset=UTF-16");
+          xhr.setRequestHeader("X-M2M-RI", "12aadftret345");
+          xhr.setRequestHeader("X-M2M-Origin", "S20170713200332320Bdfl");
+          xhr.send();
+        }
+      });*/
+    </script>
+</head>
+
+<body>
+    <header>
+      {{> header}}
+    </header>
+    {{> container}}
+
+    {{> footer}}
+
+</body>
+
+<script type="text/javascript">
+// 지도
+var layers = {};
+layers['vworld'] = new ol.layer.Tile({
+    title : 'VWorld Gray Map',
+    visible : true,
+    type : 'base',
+    source : new ol.source.XYZ({
+        url : 'http://xdworld.vworld.kr:8080/2d/Base/201612/{z}/{x}/{y}.png'
+    })
+});
+
+// vectorSource 선언
+var vectorSource = new ol.source.Vector({
+    projection: 'EPSG:4326'
+});
+
+// vectorLayer 선언
+var vectorLayer = new ol.layer.Vector({
+    source: vectorSource
+});
+
+// 지도뿌리기
+var map = new ol.Map({
+
+    layers : [ layers['vworld'], vectorLayer ],
+    target : 'v_map',
+    view : new ol.View({
+        // center: ol.proj.transform([getLongi, getLati ], 'EPSG:4326', 'EPSG:3857'),
+        center: ol.proj.fromLonLat([127.5, 36]),        // center 좌표
+        zoom: 7,                                        // 초기화면 zoom level
+        minZoom: 6,                                        // 최소 zoom level
+        maxZoom: 19                                        // 최대 zoom level
+    })
+});
+
+
+// 포인트 클릭
+  function mapSubmit(cnt){
+  // get  // 이 부분은 나중에 ajax 등을 통해서 좌표 값을 json object 형태로 가져와서 data 에 넣어주면 됨.
+  var data = new Array();
+
+  var coord = new Object();
+  if(cnt == 1){
+    coord.svy_name = "사당역";
+    coord.svy_longi =  126.98162;
+    coord.svy_lati = 37.47652;
+  }
+  else if(cnt == 2){37.5036551353092, 126.78706639151814
+    coord.svy_name = "강남역";
+    coord.svy_longi =  127.02755;
+    coord.svy_lati = 37.49793;
+  }
+  else if(cnt == 3){
+    coord.svy_name = "춘의역";
+    coord.svy_longi =  126.78708;
+    coord.svy_lati = 37.50366;
+
+  }
+  data.push(coord);
+
+  // var coord = new Object();
+  // coord.svy_name = "약진너머해수욕장";
+  // coord.svy_longi = 126.233439;
+  // coord.svy_lati = 37.180287;
+  //   data.push(coord);
+  // var coord = new Object();
+  // coord.svy_name = "떼뿌루해수욕장";
+  // coord.svy_longi = 126.175860;
+  // coord.svy_lati = 37.211874;
+  //   data.push(coord);
+  // get
+
+  svyData = data;
+  var jsonData = JSON.stringify(data) ;
+
+  addFeatures();
+  }
+
+// feature 추가
+  function addFeatures() {
+
+      var results = svyData;
+  var len = results.length;
+
+      var i, nm, lat, lon, geom, iconFeature, iconFeatures = [];
+
+      vectorSource.clear();	// vectorSource 초기화 (안에 들어있던 features 를 삭제
+
+  for(i=0 ; i<len ; i++){	// object 길이 만큼 반복문
+    nm = results[i].svy_name;
+    lon = results[i].svy_longi;
+    lat = results[i].svy_lati;
+
+    iconFeature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857')),
+      nm: nm,
+      lon: lon,
+      lat: lat
+    });
+
+    iconFeature.setStyle(
+      new ol.style.Style({
+        // jsp 에서는 잘 되던데.. html 로 뜯어오니.. 정상 작동을 안해서 주석처리
+        image: new ol.style.Icon({
+          anchor: [0.5, 0.95],
+          src: '/img/icon.png'
+        })
+
+        // 지도상에 찍히는 포인트 스타일 설정
+
+        /*
+        image: new ol.style.Circle({
+          fill: new ol.style.Fill({ color: [255,190,10,0.7] }),
+          stroke: new ol.style.Stroke({ color: [120,120,120,1] }),
+          radius: 6
+        })
+        */
+      })
+    );
+    iconFeatures.push(iconFeature);		// iconFeature 에 넣기. 조건문을 이용해 아이콘(포인트)를 다르게 찍어도 괜찮을듯.
+  }
+
+      vectorSource.addFeatures(iconFeatures);	// vectorSource 에 features 를 넣기.
+
+      map.getView().fit(vectorLayer.getSource().getExtent(), map.getSize());	// 지도상 좌표들이 다 보이는 최소크기로 이동
+
+      return iconFeatures;
+  }
+
+
+</script>
+
+</html>
