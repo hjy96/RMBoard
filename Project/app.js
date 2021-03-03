@@ -16,8 +16,25 @@ const consoleRouter	= require('./routes/consoleManagement');
 const connect	= require('./schemas/');
 const app = express();
 //hjy
+var mongoose = require('mongoose');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+
+
+// mongoose.set('useNewUrlParser', true);
+// mongoose.set('useFindAndModify', false);
+// mongoose.set('useCreateIndex', true);
+// mongoose.set('useUnifiedTopology', true);
+// mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true });
+// var db = mongoose.connection;
+// db.once('open', function(){
+//   console.log('DB connected');
+// });
+// db.on('error', function(err){
+//   console.log('DB ERROR : ', err);
+// });
+
+// var db = mongoose.connection;
 //
 
 
@@ -86,6 +103,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+app.listen(3000,()=>{
+  console.log('Server is up on port 3000')
+});
 
 module.exports = app;

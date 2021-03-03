@@ -9,10 +9,10 @@ module.exports = () => {
 		if (process.env.NODE_ENV !== 'production') {
 			mongoose.set('debug', true);
 		}
-		mongoose.connect('mongodb://rmtech:rmtech@192.168.0.117:27017/admin', {      
+		mongoose.connect('mongodb+srv://root:1234@rmboard.bwvpo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {      
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
-			dbName: 'nodejs',
+			dbName: 'myFirstDatabase',
 		}, (error) => {
 			if (error) {
 				console.log('몽고디비 연결 에러', error);

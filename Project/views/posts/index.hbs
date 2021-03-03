@@ -3,13 +3,14 @@
         <link rel="stylesheet" href="../css/hjy.css">
     </head>
     <body>
-        {{!-- {{#CheckPosts post}}
-        <h1>hello</h1>
-        {{/CheckPosts}}
-        {{#else}}
-        <h2>hello</h2>
-        {{/else}} --}}
-        hhhhh
-              
+        {{#if posts}}
+        {{{posts}}}
+    
+
+
+        {{else}}
+        no data8888888888888
+      
+        {{/if}}
     </body>
 </html>
